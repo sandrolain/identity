@@ -1,0 +1,3 @@
+[submodule "go-utilities"]
+	path = go-utilities
+	url = https://github.com/sandrolain/go-utilities
