@@ -19,6 +19,8 @@ const (
 	DEF_OTP_REQUEST_MINUTES   = 10
 	DEF_LOGIN_SESSION_MINUTES = 30
 	DEF_MACHINE_KEY_MINUTES   = 525_600 // 1 year
+	DEF_LOGIN_MAX_FAILS       = 3
+	DEF_LOGIN_LOCKOUT_MINUTES = 30
 )
 
 const (
@@ -57,9 +59,14 @@ type SecureKeyConfig struct {
 }
 
 type SessionConfig struct {
-	OTPRequestDuration   int
-	LoginSessionDuration int
-	MachineKeyDuration   int
+	OTPRequestMinutes   int
+	LoginSessionMinutes int
+	MachineKeyMinutes   int
+}
+
+type LoginConfig struct {
+	MaxFails       int
+	LockoutMinutes int
 }
 
 type Config struct {
@@ -69,6 +76,7 @@ type Config struct {
 	OTP        OTPConfig
 	JWT        JWTConfig
 	Session    SessionConfig
+	Login      LoginConfig
 	SecureKey  SecureKeyConfig
 }
 
@@ -109,9 +117,13 @@ func GetConfiguration() (Config, error) {
 			Issuer: envutils.GetEnvString(ENV_JWT_ISSUER, DEF_JWT_ISSUER),
 		},
 		Session: SessionConfig{
-			OTPRequestDuration:   DEF_OTP_REQUEST_MINUTES,
-			LoginSessionDuration: DEF_LOGIN_SESSION_MINUTES,
-			MachineKeyDuration:   DEF_MACHINE_KEY_MINUTES,
+			OTPRequestMinutes:   DEF_OTP_REQUEST_MINUTES,
+			LoginSessionMinutes: DEF_LOGIN_SESSION_MINUTES,
+			MachineKeyMinutes:   DEF_MACHINE_KEY_MINUTES,
+		},
+		Login: LoginConfig{
+			MaxFails:       DEF_LOGIN_MAX_FAILS,
+			LockoutMinutes: DEF_LOGIN_LOCKOUT_MINUTES,
 		},
 		MongoDB: MongoDBConfig{
 			URI:      mongoDbURI,

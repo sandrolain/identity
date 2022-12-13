@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package clientgrpc;
+
+option go_package = "./clientgrpc";
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string totpToken = 1;
+}
+
+message LoginConfirmRequest {
+  string totpToken = 1;
+  string totp = 2;
+}
+
+message LoginConfirmResponse {
+  string sessionToken = 1;
+}
+
+service ClientService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
+}
