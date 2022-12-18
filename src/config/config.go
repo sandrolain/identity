@@ -11,12 +11,12 @@ const (
 	DEF_MONGODB_TIMEOUT       = 5
 	DEF_GRPC_ADMIN_PORT       = 1984
 	DEF_GRPC_CLIENT_PORT      = 1985
-	DEF_OTP_RECOVERY_LENGTH   = 4
-	DEF_OTP_RECOVERY_SIZE     = 8
-	DEF_OTP_ISSUER            = "identity"
+	DEF_TOTP_RECOVERY_LENGTH  = 4
+	DEF_TOTP_RECOVERY_SIZE    = 8
+	DEF_TOTP_ISSUER           = "identity"
 	DEF_KEY_LENGTH            = 32
 	DEF_JWT_ISSUER            = "identity"
-	DEF_OTP_REQUEST_MINUTES   = 10
+	DEF_TOTP_REQUEST_MINUTES  = 10
 	DEF_LOGIN_SESSION_MINUTES = 30
 	DEF_MACHINE_KEY_MINUTES   = 525_600 // 1 year
 	DEF_LOGIN_MAX_FAILS       = 3
@@ -26,7 +26,7 @@ const (
 const (
 	ENV_MASTER_KEY_B64 = "ID_MASTER_KEY_B64"
 	ENV_MONGODB_URI    = "ID_MONGODB_URI"
-	ENV_OTP_ISSUER     = "ID_OTP_ISSUER"
+	ENV_TOTP_ISSUER    = "ID_TOTP_ISSUER"
 	ENV_JWT_ISSUER     = "ID_JWT_ISSUER"
 )
 
@@ -45,7 +45,7 @@ type GRPCConfig struct {
 	Port int
 }
 
-type OTPConfig struct {
+type TOTPConfig struct {
 	Issuer         string
 	RecoveryTokens RecoveryTokensConfig
 }
@@ -59,7 +59,7 @@ type SecureKeyConfig struct {
 }
 
 type SessionConfig struct {
-	OTPRequestMinutes   int
+	TOTPRequestMinutes  int
 	LoginSessionMinutes int
 	MachineKeyMinutes   int
 }
@@ -73,7 +73,7 @@ type Config struct {
 	MongoDB    MongoDBConfig
 	AdminGRPC  GRPCConfig
 	ClientGRPC GRPCConfig
-	OTP        OTPConfig
+	TOTP       TOTPConfig
 	JWT        JWTConfig
 	Session    SessionConfig
 	Login      LoginConfig
@@ -106,18 +106,18 @@ func GetConfiguration() (Config, error) {
 			MasterKey: mk,
 			Length:    DEF_KEY_LENGTH,
 		},
-		OTP: OTPConfig{
+		TOTP: TOTPConfig{
 			RecoveryTokens: RecoveryTokensConfig{
-				Length: DEF_OTP_RECOVERY_LENGTH,
-				Size:   DEF_OTP_RECOVERY_SIZE,
+				Length: DEF_TOTP_RECOVERY_LENGTH,
+				Size:   DEF_TOTP_RECOVERY_SIZE,
 			},
-			Issuer: envutils.GetEnvString(ENV_OTP_ISSUER, DEF_OTP_ISSUER),
+			Issuer: envutils.GetEnvString(ENV_TOTP_ISSUER, DEF_TOTP_ISSUER),
 		},
 		JWT: JWTConfig{
 			Issuer: envutils.GetEnvString(ENV_JWT_ISSUER, DEF_JWT_ISSUER),
 		},
 		Session: SessionConfig{
-			OTPRequestMinutes:   DEF_OTP_REQUEST_MINUTES,
+			TOTPRequestMinutes:  DEF_TOTP_REQUEST_MINUTES,
 			LoginSessionMinutes: DEF_LOGIN_SESSION_MINUTES,
 			MachineKeyMinutes:   DEF_MACHINE_KEY_MINUTES,
 		},

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sandrolain/go-utilities/pkg/mongodb"
+	"github.com/sandrolain/go-utilities/pkg/mongoutils"
 	"github.com/sandrolain/identity/src/config"
 	"github.com/sandrolain/identity/src/grpc/admingrpc"
 	"github.com/sandrolain/identity/src/grpc/clientgrpc"
@@ -20,7 +20,7 @@ func main() {
 
 	fmt.Printf("cfg: %v\n", cfg)
 
-	_, err = mongodb.NewDatabaseClient(cfg.MongoDB.URI, cfg.MongoDB.Database, time.Second*time.Duration(cfg.MongoDB.Timeout))
+	_, err = mongoutils.NewClient(cfg.MongoDB.URI, cfg.MongoDB.Database, time.Second*time.Duration(cfg.MongoDB.Timeout))
 	if err != nil {
 		log.Fatalf("cannot create MongoDB client: %v", err)
 	}
