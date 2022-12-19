@@ -1,15 +1,18 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"sync"
 	"time"
 
-	"github.com/sandrolain/go-utilities/pkg/mongoutils"
+	"github.com/sandrolain/identity/src/api"
 	"github.com/sandrolain/identity/src/config"
 	"github.com/sandrolain/identity/src/grpc/admingrpc"
 	"github.com/sandrolain/identity/src/grpc/clientgrpc"
+	"github.com/sandrolain/identity/src/storage/mongostorage"
+	"github.com/sandrolain/identity/src/storage/redisstorage"
 )
 
 func main() {
@@ -17,19 +20,29 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot load environment configuration: %v", err)
 	}
+	fmt.Printf("cfg: %+v\n", cfg)
 
-	fmt.Printf("cfg: %v\n", cfg)
-
-	_, err = mongoutils.NewClient(cfg.MongoDB.URI, cfg.MongoDB.Database, time.Second*time.Duration(cfg.MongoDB.Timeout))
+	mongodbStorage, err := mongostorage.CreateMongoDBStorage(cfg.MongoDb.Uri, cfg.MongoDb.Database, time.Duration(cfg.MongoDb.Timeout)*time.Second)
 	if err != nil {
-		log.Fatalf("cannot create MongoDB client: %v", err)
+		log.Fatalf("cannot create MongoDB storage client: %v", err)
+	}
+
+	redisStorage, err := redisstorage.CreateRedisStorage(cfg.Redis.Host, cfg.Redis.Password, &tls.Config{}, time.Duration(cfg.Redis.Timeout)*time.Second)
+	if err != nil {
+		log.Fatalf("cannot create Redis storage client: %v", err)
+	}
+
+	api := &api.API{
+		Config:            cfg,
+		VolatileStorage:   redisStorage,
+		PersistentStorage: mongodbStorage,
 	}
 
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
 
 	go func() {
-		err = admingrpc.StartServer(cfg.AdminGRPC.Port)
+		err = admingrpc.StartServer(api)
 		if err != nil {
 			log.Fatalf("cannot start admin gRPC server: %v", err)
 		}
@@ -37,7 +50,7 @@ func main() {
 	}()
 
 	go func() {
-		err = clientgrpc.StartServer(cfg.ClientGRPC.Port)
+		err = clientgrpc.StartServer(api)
 		if err != nil {
 			log.Fatalf("cannot start client gRPC server: %v", err)
 		}

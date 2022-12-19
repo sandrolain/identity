@@ -18,7 +18,7 @@ func (s *MemoryStorage) GetSession(sessionId string) (sessions.Session, error) {
 	}
 	return sessions.Session{}, crudutils.NotFound(sessionId)
 }
-func (s *MemoryStorage) GetAllSessions(entityId string) ([]sessions.Session, error) {
+func (s *MemoryStorage) GetEntitySessions(entityId string) ([]sessions.Session, error) {
 	ss, ok := s.entitiesSessions[entityId]
 	if !ok {
 		return make([]sessions.Session, 0), nil
@@ -43,7 +43,7 @@ func (s *MemoryStorage) DeleteSession(sessionId string) error {
 	delete(s.sessions, sessionId)
 	return nil
 }
-func (s *MemoryStorage) DeleteAllSessions(entityId string) error {
+func (s *MemoryStorage) DeleteEntitySessions(entityId string) error {
 	ss, found := s.entitiesSessions[entityId]
 	if !found {
 		return nil

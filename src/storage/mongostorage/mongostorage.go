@@ -61,7 +61,7 @@ func (s *MongoDBStorage) GetSession(sessionId string) (sessions.Session, error) 
 	}
 	return u, nil
 }
-func (s *MongoDBStorage) GetAllSessions(entityId string) ([]sessions.Session, error) {
+func (s *MongoDBStorage) GetEntitySessions(entityId string) ([]sessions.Session, error) {
 	var u []sessions.Session
 	err := s.client.FindManyByField(SESSIONS_COLLECTION, "entityId", entityId, 1, -1, &u)
 	return u, err
@@ -74,7 +74,7 @@ func (s *MongoDBStorage) DeleteSession(sessionId string) error {
 	_, err := s.client.DeleteOneById(SESSIONS_COLLECTION, sessionId)
 	return err
 }
-func (s *MongoDBStorage) DeleteAllSessions(entityId string) error {
+func (s *MongoDBStorage) DeleteEntitySessions(entityId string) error {
 	_, err := s.client.DeleteMany(SESSIONS_COLLECTION, map[string]string{"entityId": entityId})
 	return err
 }

@@ -48,8 +48,8 @@ type TotpParams struct {
 	Issuer  string
 }
 
-func CreateEntity(entityId string, password string, totpConfig config.TOTPConfig) (*Entity, error) {
-	u := &Entity{
+func CreateEntity(entityId string, password string, totpConfig config.TotpConfig) (u Entity, err error) {
+	u = Entity{
 		Id:    entityId,
 		Roles: make(EntityRoles, 0),
 	}
@@ -66,13 +66,11 @@ func CreateEntity(entityId string, password string, totpConfig config.TOTPConfig
 		return u, fmt.Errorf(`invalid password for user "%s"`, u.Id)
 	}
 
-	err := u.SetPassword(password)
-	if err != nil {
+	if err = u.SetPassword(password); err != nil {
 		return u, err
 	}
 
-	err = u.ResetTotp(totpConfig)
-	if err != nil {
+	if err = u.ResetTotp(totpConfig); err != nil {
 		return u, err
 	}
 
@@ -108,7 +106,7 @@ func (u *Entity) SetMachine(machine bool) {
 	u.Machine = machine
 }
 
-func (u *Entity) ResetTotp(config config.TOTPConfig) error {
+func (u *Entity) ResetTotp(config config.TotpConfig) error {
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      config.Issuer,
 		AccountName: u.Id,

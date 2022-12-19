@@ -27,7 +27,7 @@ func (s *RedisStorage) GetSession(sessionId string) (sessions.Session, error) {
 	}
 	return sess, err
 }
-func (s *RedisStorage) GetAllSessions(entityId string) ([]sessions.Session, error) {
+func (s *RedisStorage) GetEntitySessions(entityId string) ([]sessions.Session, error) {
 	var sess sessions.Session
 	var res []sessions.Session
 	all, err := s.client.GetAll(redisutils.Key{"sessions", entityId}, &sess)
@@ -42,7 +42,7 @@ func (s *RedisStorage) SaveSession(sess sessions.Session) error {
 func (s *RedisStorage) DeleteSession(sessionId string) error {
 	return s.client.Delete(redisutils.Key{"sessions", sessionId})
 }
-func (s *RedisStorage) DeleteAllSessions(entityId string) error {
+func (s *RedisStorage) DeleteEntitySessions(entityId string) error {
 	// TODO:
 	return nil
 }

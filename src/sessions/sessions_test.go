@@ -48,7 +48,7 @@ func TestSessionIsValid(t *testing.T) {
 		t.Fatalf(`Expect %+v to be valid`, sess)
 	}
 
-	sess = &Session{}
+	sess = Session{}
 
 	if sess.Valid() {
 		t.Fatalf(`Expect %+v to be not valid`, sess)

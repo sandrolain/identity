@@ -39,20 +39,20 @@ func ValidScope(scope string) bool {
 }
 
 // NewSession create a new Session object with the username and duration specified
-func NewSession(scope string, username string, duration time.Duration, kp keys.SecureKeyParams) (*Session, error) {
+func NewSession(scope string, username string, duration time.Duration, kp keys.SecureKeyParams) (s Session, err error) {
 	if !ValidScope(scope) {
-		return nil, fmt.Errorf(`Invalid Session Scope "%s"`, scope)
+		return s, fmt.Errorf(`Invalid Session Scope "%s"`, scope)
 	}
 	if !entities.ValidEntityId(username) {
-		return nil, fmt.Errorf(`Invalid Session Entityname "%s"`, username)
+		return s, fmt.Errorf(`Invalid Session Entityname "%s"`, username)
 	}
 	id := ksuid.New().String()
 	key, err := keys.NewSecureKey(id, kp)
 	if err != nil {
-		return nil, err
+		return s, err
 	}
 	expire := time.Now().Add(duration)
-	return &Session{
+	return Session{
 		Id:       id,
 		Scope:    scope,
 		EntityId: username,

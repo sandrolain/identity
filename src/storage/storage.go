@@ -14,16 +14,16 @@ type PersistentStorage interface {
 	GetSession(sessionId string) (sessions.Session, error)
 	SaveSession(session sessions.Session) error
 	DeleteSession(sessionId string) error
-	GetAllSessions(entityId string) ([]sessions.Session, error)
-	DeleteAllSessions(entityId string) error
+	GetEntitySessions(entityId string) ([]sessions.Session, error)
+	DeleteEntitySessions(entityId string) error
 }
 
 type VolatileStorage interface {
 	GetSession(sessionId string) (sessions.Session, error)
 	SaveSession(session sessions.Session) error
 	DeleteSession(sessionId string) error
-	GetAllSessions(entityId string) ([]sessions.Session, error)
-	DeleteAllSessions(entityId string) error
+	GetEntitySessions(entityId string) ([]sessions.Session, error)
+	DeleteEntitySessions(entityId string) error
 
 	GetExpiringKeys(scope string) (keys.ExpiringKeyList, error)
 	SaveExpiringKeys(scope string, keysList keys.ExpiringKeyList) error

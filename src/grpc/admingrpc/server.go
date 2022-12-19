@@ -5,24 +5,30 @@ import (
 	"log"
 	"net"
 
+	"github.com/sandrolain/identity/src/api"
 	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type admingrpcServer struct {
+	Api *api.API
 	UnimplementedAdminServiceServer
 }
 
-func StartServer(port int) error {
-	address := fmt.Sprintf("localhost:%d", port)
-	log.Printf("start admin gRPC server on %v", address)
+func StartServer(a *api.API) error {
+	cfg := a.Config.AdminGrpc
+	address := fmt.Sprintf("localhost:%d", cfg.Port)
+	log.Printf("start gRPC server on %v", address)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
-	var opts []grpc.ServerOption
-	// TODO: SSL
-	// TODO: Auth
-	grpcServer := grpc.NewServer(opts...)
-	RegisterAdminServiceServer(grpcServer, admingrpcServer{})
+	defer lis.Close()
+	creds, err := credentials.NewServerTLSFromFile(cfg.CertFile, cfg.KeyFile)
+	if err != nil {
+		return fmt.Errorf("failed to create gRPC TLS: %v", err)
+	}
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	RegisterAdminServiceServer(grpcServer, admingrpcServer{Api: a})
 	return grpcServer.Serve(lis)
 }
