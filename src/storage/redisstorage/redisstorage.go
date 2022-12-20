@@ -9,11 +9,11 @@ import (
 	"github.com/sandrolain/go-utilities/pkg/redisutils"
 	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
+	"github.com/sandrolain/identity/src/storage"
 )
 
 type RedisStorage struct {
-	client      *redisutils.Client
-	sessionsTtl time.Duration
+	client *redisutils.Client
 }
 
 func (s *RedisStorage) GetSession(sessionId string) (sessions.Session, error) {
@@ -36,8 +36,8 @@ func (s *RedisStorage) GetEntitySessions(entityId string) ([]sessions.Session, e
 	}
 	return redisutils.AllAsType[sessions.Session](all)
 }
-func (s *RedisStorage) SaveSession(sess sessions.Session) error {
-	return s.client.Set(redisutils.Key{"sessions", sess.Id}, sess, s.sessionsTtl)
+func (s *RedisStorage) SaveSession(sess sessions.Session, ttl time.Duration) error {
+	return s.client.Set(redisutils.Key{"sessions", sess.Id}, sess, ttl)
 }
 func (s *RedisStorage) DeleteSession(sessionId string) error {
 	return s.client.Delete(redisutils.Key{"sessions", sessionId})
@@ -55,7 +55,7 @@ func (s *RedisStorage) SaveExpiringKeys(scope string, keysList keys.ExpiringKeyL
 	return nil
 }
 
-func CreateRedisStorage(host string, password string, tls *tls.Config, timeout time.Duration) (*RedisStorage, error) {
+func CreateRedisStorage(host string, password string, tls *tls.Config, timeout time.Duration) (storage.VolatileStorage, error) {
 	client, err := redisutils.NewClient(host, password, tls, timeout)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create new Redis client: %v", err)

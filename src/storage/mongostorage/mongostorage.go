@@ -9,6 +9,7 @@ import (
 	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
+	"github.com/sandrolain/identity/src/storage"
 )
 
 const (
@@ -102,7 +103,7 @@ func (s *MongoDBStorage) DeleteKey(name string) error {
 	return err
 }
 
-func CreateMongoDBStorage(uri string, database string, timeout time.Duration) (*MongoDBStorage, error) {
+func CreateMongoDBStorage(uri string, database string, timeout time.Duration) (storage.PersistentStorage, error) {
 	client, err := mongoutils.NewClient(uri, database, timeout)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create new MongoDB client: %v", err)

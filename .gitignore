@@ -23,5 +23,5 @@ vendor/
 .trash/
 bin/
 localtest/data/
-cert/*.pem
-cert/*.srl
+localtest/cert/*.pem
+localtest/cert/*.srl

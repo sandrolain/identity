@@ -1,9 +1,13 @@
 package clientgrpc
 
-import context "context"
+import (
+	context "context"
+	"fmt"
+)
 
 func (s clientgrpcServer) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
 	res, err := s.Api.Login(req.Email, req.Password)
+	fmt.Printf("res: %v\n", res)
 	if err != nil {
 		return nil, err
 	}

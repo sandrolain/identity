@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/sandrolain/identity/src/keys"
@@ -13,6 +14,7 @@ func (a *API) CreateSessionAndJWT(scope string, username string) (string, error)
 		MasterKey: a.Config.SecureKey.MasterKey,
 	}
 	sess, err := a.CreateSession(scope, username, kp)
+	fmt.Printf("sess: %v\n", sess)
 	if err != nil {
 		return "", err
 	}
@@ -33,11 +35,11 @@ func (a *API) CreateSession(scope string, username string, kp keys.SecureKeyPara
 	case sessions.SCOPE_MACHINE:
 		duration = time.Minute * time.Duration(a.Config.Session.MachineKeyMinutes)
 	}
-	s, err = sessions.NewSession(scope, username, duration, kp)
-	if err != nil {
+	if s, err = sessions.NewSession(scope, username, duration, kp); err != nil {
 		return
 	}
-	err = a.VolatileStorage.SaveSession(s)
+	err = a.VolatileStorage.SaveSession(s, duration)
+	fmt.Printf("err: %v\n", err)
 	return
 }
 
@@ -54,7 +56,7 @@ func (a *API) ExtendSession(sessionId string, duration time.Duration) (s session
 		return s, &sessions.SessionExpiredError{}
 	}
 	s.Extend(duration)
-	if err = a.VolatileStorage.SaveSession(s); err != nil {
+	if err = a.VolatileStorage.SaveSession(s, duration); err != nil {
 		return s, err
 	}
 	return s, nil

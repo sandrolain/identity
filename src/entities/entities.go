@@ -25,12 +25,12 @@ type EntityRole string
 type EntityRoles []EntityRole
 
 type Entity struct {
-	Id             string      `json:"_id" bson:"_id"`
+	Id             string      `json:"id" bson:"_id"`
 	Type           int         `json:"type" bson:"type"`
 	PasswordHash   []byte      `json:"passwordHash" bson:"passwordHash"`
 	Machine        bool        `json:"machine" bson:"machine"`
-	TotpConfigured bool        `json:"totp" bson:"totp"`
-	TotpUri        string      `json:"totp" bson:"totp"`
+	TotpConfigured bool        `json:"totpConfigured" bson:"totpConfigured"`
+	TotpUri        string      `json:"totpUri" bson:"totpUri"`
 	RecoveryTokens []string    `json:"recoveryTokens" bson:"recoveryTokens"`
 	Roles          EntityRoles `json:"roles" bson:"roles"`
 }
@@ -55,7 +55,7 @@ func CreateEntity(entityId string, password string, totpConfig config.TotpConfig
 	}
 
 	if !ValidEntityId(u.Id) {
-		return u, fmt.Errorf(`invalid entityId "%s"`, u.Id)
+		return u, fmt.Errorf(`invalid entity ID "%s"`, u.Id)
 	}
 
 	if password == "" {
@@ -63,7 +63,7 @@ func CreateEntity(entityId string, password string, totpConfig config.TotpConfig
 	}
 
 	if !ValidPassword(password) {
-		return u, fmt.Errorf(`invalid password for user "%s"`, u.Id)
+		return u, fmt.Errorf(`invalid password for entity "%s"`, u.Id)
 	}
 
 	if err = u.SetPassword(password); err != nil {
@@ -89,10 +89,10 @@ func (u *Entity) IsAdmin() bool {
 	return u.Type == TypeAdmin
 }
 
-func (u *Entity) SetPassword(password string) error {
+func (u *Entity) SetPassword(password string) (err error) {
 	hashBytes, err := cryptoutils.BcryptHash([]byte(password))
 	if err != nil {
-		return err
+		return
 	}
 	u.PasswordHash = hashBytes
 	return nil

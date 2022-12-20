@@ -1,9 +1,12 @@
 package memorystorage
 
 import (
+	"time"
+
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
+	"github.com/sandrolain/identity/src/storage"
 )
 
 type MemoryStorage struct {
@@ -35,7 +38,7 @@ func (s *MemoryStorage) GetEntitySessions(entityId string) ([]sessions.Session, 
 	}
 	return res, nil
 }
-func (s *MemoryStorage) SaveSession(sess sessions.Session) error {
+func (s *MemoryStorage) SaveSession(sess sessions.Session, ttl time.Duration) error {
 	s.sessions[sess.Id] = sess
 	return nil
 }
@@ -69,7 +72,7 @@ func (s *MemoryStorage) SaveExpiringKeys(scope string, keysList keys.ExpiringKey
 	return nil
 }
 
-func CreateMemoryStorage() *MemoryStorage {
+func CreateMemoryStorage() storage.VolatileStorage {
 	return &MemoryStorage{
 		sessions:         make(map[string]sessions.Session),
 		entitiesSessions: make(map[string]map[string]bool),
