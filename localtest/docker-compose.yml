@@ -18,4 +18,17 @@ services:
     volumes:
       - ./data/redis:/data
       - ./cert:/cert
-    command: redis-server --requirepass "development.password" --tls-port 6379 --port 0 --tls-cert-file /cert/redis-server-cert.pem --tls-key-file /cert/redis-server-key.pem --tls-ca-cert-file /cert/ca-cert.pem
+    #command: redis-server --requirepass "development.password" --tls-port 6379 --port 0 --tls-cert-file /cert/redis-server-cert.pem --tls-key-file /cert/redis-server-key.pem --tls-ca-cert-file /cert/ca-cert.pem
+    command: redis-server --requirepass "development.password" --port 6379
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
+    restart: always
+    volumes:
+      - ./cert:/cert
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:development.password
+    ports:
+    - "8081:8081"

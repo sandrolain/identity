@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
+	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -14,13 +15,29 @@ type LoginTotpResult struct {
 	SessionToken string
 }
 
-func (a *API) Login(entityId string, password string) (res LoginResult, err error) {
+type EntityDetailsResult struct {
+	EntityId string
+	Type     entities.EntityType
+	Roles    entities.EntityRoles
+}
+
+func (a *API) Login(entityType entities.EntityType, entityId string, password string) (res LoginResult, err error) {
+	if !entities.ValidEntityId(entityId) {
+		err = crudutils.InvalidValue(entityId)
+		return
+	}
+
 	u, err := a.AuthenticateWithCredentials(entityId, password)
 	if err != nil {
 		return
 	}
 
-	token, err := a.CreateSessionAndJWT(sessions.SCOPE_OTP, u.Id)
+	if u.Type != entityType || !u.IsEnabled() {
+		err = crudutils.NotFound(entityId)
+		return
+	}
+
+	token, err := a.CreateSessionAndJWT(sessions.ScopeTotp, u.Id)
 	if err != nil {
 		return
 	}
@@ -35,7 +52,7 @@ func (a *API) Login(entityId string, password string) (res LoginResult, err erro
 }
 
 func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err error) {
-	u, _, err := a.AuthenticateWithSessionJWT(token)
+	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeTotp, token)
 	if err != nil {
 		return
 	}
@@ -49,12 +66,23 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 		return
 	}
 
-	token, err = a.CreateSessionAndJWT(sessions.SCOPE_SESSION, u.Id)
+	token, err = a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)
 	if err != nil {
 		return
 	}
 
 	res.SessionToken = token
 
+	return
+}
+
+func (a *API) GetEntityDetails(token string) (res EntityDetailsResult, err error) {
+	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
+	if err != nil {
+		return
+	}
+	res.EntityId = u.Id
+	res.Type = u.Type
+	res.Roles = u.Roles
 	return
 }

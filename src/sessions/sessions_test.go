@@ -16,7 +16,7 @@ func getKeyParams() keys.SecureKeyParams {
 
 func TestSessionCreate(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	sess, err := NewSession(scope, username, duration, getKeyParams())
 
@@ -36,7 +36,7 @@ func TestSessionCreate(t *testing.T) {
 
 func TestSessionIsValid(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	sess, err := NewSession(scope, username, duration, getKeyParams())
 
@@ -57,7 +57,7 @@ func TestSessionIsValid(t *testing.T) {
 
 func TestSessionExtend(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	sess, err := NewSession(scope, username, duration, getKeyParams())
 
@@ -80,7 +80,7 @@ func TestSessionExtend(t *testing.T) {
 
 func TestSessionIsExpired(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	sess, err := NewSession(scope, username, duration, getKeyParams())
 
@@ -101,7 +101,7 @@ func TestSessionIsExpired(t *testing.T) {
 
 func TestSessionGetID(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	sess, err := NewSession(scope, username, duration, getKeyParams())
 
@@ -126,7 +126,7 @@ func TestSessionGetID(t *testing.T) {
 
 func TestSessionGetEntityname(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	sess, err := NewSession(scope, username, duration, getKeyParams())
 
@@ -141,7 +141,7 @@ func TestSessionGetEntityname(t *testing.T) {
 
 func TestSessionJWT(t *testing.T) {
 	username := "john"
-	scope := "auth"
+	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	kp := getKeyParams()
 	sess, err := NewSession(scope, username, duration, kp)

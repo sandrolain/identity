@@ -2,12 +2,12 @@ package clientgrpc
 
 import (
 	context "context"
-	"fmt"
+
+	"github.com/sandrolain/identity/src/entities"
 )
 
 func (s clientgrpcServer) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
-	res, err := s.Api.Login(req.Email, req.Password)
-	fmt.Printf("res: %v\n", res)
+	res, err := s.Api.Login(entities.TypeUser, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}

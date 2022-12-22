@@ -1,9 +1,13 @@
 package admingrpc
 
-import context "context"
+import (
+	context "context"
+
+	"github.com/sandrolain/identity/src/entities"
+)
 
 func (s admingrpcServer) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
-	res, err := s.Api.Login(req.Email, req.Password)
+	res, err := s.Api.Login(entities.TypeAdmin, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}

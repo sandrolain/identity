@@ -36,8 +36,8 @@ func (s *RedisStorage) GetEntitySessions(entityId string) ([]sessions.Session, e
 	}
 	return redisutils.AllAsType[sessions.Session](all)
 }
-func (s *RedisStorage) SaveSession(sess sessions.Session, ttl time.Duration) error {
-	return s.client.Set(redisutils.Key{"sessions", sess.Id}, sess, ttl)
+func (s *RedisStorage) SaveSession(sess sessions.Session) error {
+	return s.client.Set(redisutils.Key{"sessions", sess.Id}, sess, sess.GetTtl())
 }
 func (s *RedisStorage) DeleteSession(sessionId string) error {
 	return s.client.Delete(redisutils.Key{"sessions", sessionId})

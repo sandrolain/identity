@@ -7,15 +7,16 @@ import (
 	"github.com/sandrolain/identity/src/entities"
 )
 
-func (a *API) CreateEntity(username string, password string) (u entities.Entity, err error) {
+func (a *API) CreateEntity(typ entities.EntityType, username string, password string) (u entities.Entity, err error) {
 	_, err = a.GetEntityById(username)
 	if err == nil {
-		return u, fmt.Errorf(`Entity "%s" already exist`, username)
+		err = fmt.Errorf(`entity "%s" already exist`, username)
+		return
 	} else if !crudutils.IsNotFound(err) {
-		return u, err
+		return
 	}
-	if u, err = entities.CreateEntity(username, password, a.Config.Totp); err != nil {
-		return u, err
+	if u, err = entities.NewEntity(typ, username, password, a.Config.Totp); err != nil {
+		return
 	}
 	return u, a.PersistentStorage.SaveEntity(u)
 }

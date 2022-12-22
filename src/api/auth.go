@@ -19,24 +19,35 @@ func (a *API) AuthenticateWithCredentials(entityId string, password string) (*en
 	return &u, nil
 }
 
-func (a *API) AuthenticateWithSessionJWT(token string) (u entities.Entity, s sessions.Session, err error) {
+func (a *API) AuthenticateWithSessionJWT(scope sessions.SessionScope, token string) (u entities.Entity, s sessions.Session, err error) {
 	info, err := jwtutils.ExtractInfoFromJWT(token)
 	if err != nil {
-		return u, s, err
+		return
 	}
-	if s, err = a.GetSession(info.Subject); err != nil {
-		return u, s, err
+	if info.Scope != string(scope) {
+		err = crudutils.NotFound(info.Subject)
+		return
 	}
+
+	if s, err = a.GetSession(scope, info.Subject); err != nil {
+		return
+	}
+
+	if s.IsExpired() {
+		err = crudutils.NotFound(info.Subject)
+		return
+	}
+
 	kp := keys.SecureKeyParams{
 		Length:    a.Config.SecureKey.Length,
 		MasterKey: a.Config.SecureKey.MasterKey,
 	}
+
 	if err = s.VerifySessionJWT(token, kp); err != nil {
-		return u, s, err
-	}
-	if u, err = a.GetEntityById(s.EntityId); err != nil {
-		return u, s, err
+		return
 	}
 
-	return u, s, nil
+	u, err = a.GetEntityById(s.EntityId)
+
+	return
 }

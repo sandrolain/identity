@@ -25,3 +25,4 @@ bin/
 localtest/data/
 localtest/cert/*.pem
 localtest/cert/*.srl
+node_modules/

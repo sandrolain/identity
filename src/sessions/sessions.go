@@ -10,10 +10,12 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
+type SessionScope string
+
 const (
-	SCOPE_SESSION = "sid"
-	SCOPE_OTP     = "otp"
-	SCOPE_MACHINE = "mac"
+	ScopeTotp    SessionScope = "otp"
+	ScopeLogin   SessionScope = "sid"
+	ScopeMachine SessionScope = "mac"
 )
 
 type SessionExpiredError struct{}
@@ -26,7 +28,7 @@ type SessionIP string
 type SessionIPs []SessionIP
 type Session struct {
 	Id         string          `json:"_id" bson:"_id"`
-	Scope      string          `json:"scope" bson:"scope"`
+	Scope      SessionScope    `json:"scope" bson:"scope"`
 	EntityId   string          `json:"entityId" bson:"entityId"`
 	Expire     time.Time       `json:"expire" bson:"expire"`
 	Machine    bool            `json:"machine" bson:"machine"`
@@ -34,12 +36,12 @@ type Session struct {
 	Key        keys.SecuredKey `json:"key" bson:"key"`
 }
 
-func ValidScope(scope string) bool {
+func ValidScope(scope SessionScope) bool {
 	return scope != ""
 }
 
 // NewSession create a new Session object with the username and duration specified
-func NewSession(scope string, username string, duration time.Duration, kp keys.SecureKeyParams) (s Session, err error) {
+func NewSession(scope SessionScope, username string, duration time.Duration, kp keys.SecureKeyParams) (s Session, err error) {
 	if !ValidScope(scope) {
 		return s, fmt.Errorf(`Invalid Session Scope "%s"`, scope)
 	}
@@ -73,8 +75,11 @@ func (s *Session) Extend(duration time.Duration) {
 
 // IsExpired returns a boolean that indicate if the time limit of the session is elapsed
 func (s *Session) IsExpired() bool {
-	now := time.Now()
-	return s.Expire.Before(now)
+	return s.Expire.Before(time.Now())
+}
+
+func (s *Session) GetTtl() time.Duration {
+	return s.Expire.Sub(time.Now())
 }
 
 // getID returns the identifier of the session
@@ -96,7 +101,7 @@ func (s *Session) CreateSessionJWT(issuer string, kp keys.SecureKeyParams) (stri
 		ExpiresAt: s.Expire,
 		Issuer:    issuer,
 		Secret:    key.Value,
-		Scope:     s.Scope,
+		Scope:     string(s.Scope),
 		Subject:   s.Id,
 	})
 }
@@ -108,7 +113,7 @@ func (s *Session) VerifySessionJWT(jwtString string, kp keys.SecureKeyParams) er
 	}
 	sessionId, err := jwtutils.ParseJWT(jwtString, jwtutils.JWTParams{
 		Secret: key.Value,
-		Scope:  s.Scope,
+		Scope:  string(s.Scope),
 	})
 	if err != nil {
 		return err

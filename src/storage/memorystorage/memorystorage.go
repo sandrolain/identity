@@ -1,44 +1,55 @@
 package memorystorage
 
 import (
-	"time"
-
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
+	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
-	"github.com/sandrolain/identity/src/storage"
 )
 
 type MemoryStorage struct {
+	entities         map[string]entities.Entity
 	sessions         map[string]sessions.Session
 	entitiesSessions map[string]map[string]bool
 	expKeys          map[string]keys.ExpiringKeyList
 }
 
-func (s *MemoryStorage) GetSession(sessionId string) (sessions.Session, error) {
-	if u, ok := s.sessions[sessionId]; ok {
-		return u, nil
-	}
-	return sessions.Session{}, crudutils.NotFound(sessionId)
-}
-func (s *MemoryStorage) GetEntitySessions(entityId string) ([]sessions.Session, error) {
-	ss, ok := s.entitiesSessions[entityId]
+func (s *MemoryStorage) GetEntity(entityId string) (u entities.Entity, err error) {
+	u, ok := s.entities[entityId]
 	if !ok {
-		return make([]sessions.Session, 0), nil
+		err = crudutils.NotFound(entityId)
 	}
-	res := make([]sessions.Session, len(ss))
-	i := 0
-	for sid, _ := range ss {
-		sess, err := s.GetSession(sid)
-		if err != nil {
-			return nil, err
-		}
-		res[i] = sess
-		i++
-	}
-	return res, nil
+	return
 }
-func (s *MemoryStorage) SaveSession(sess sessions.Session, ttl time.Duration) error {
+func (s *MemoryStorage) SaveEntity(u entities.Entity) (err error) {
+	s.entities[u.Id] = u
+	return
+}
+func (s *MemoryStorage) DeleteEntity(entityId string) (err error) {
+	delete(s.entities, entityId)
+	return
+}
+
+func (s *MemoryStorage) GetSession(sessionId string) (sess sessions.Session, err error) {
+	sess, ok := s.sessions[sessionId]
+	if !ok {
+		err = crudutils.NotFound(sessionId)
+	}
+	if sess.IsExpired() {
+		delete(s.sessions, sessionId)
+		ok = false
+	}
+	return
+}
+func (s *MemoryStorage) GetEntitySessions(entityId string) (res []sessions.Session, err error) {
+	for _, sess := range s.sessions {
+		if sess.EntityId == entityId {
+			res = append(res, sess)
+		}
+	}
+	return
+}
+func (s *MemoryStorage) SaveSession(sess sessions.Session) error {
 	s.sessions[sess.Id] = sess
 	return nil
 }
@@ -72,8 +83,9 @@ func (s *MemoryStorage) SaveExpiringKeys(scope string, keysList keys.ExpiringKey
 	return nil
 }
 
-func CreateMemoryStorage() storage.VolatileStorage {
+func CreateMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
+		entities:         make(map[string]entities.Entity),
 		sessions:         make(map[string]sessions.Session),
 		entitiesSessions: make(map[string]map[string]bool),
 		expKeys:          make(map[string]keys.ExpiringKeyList),

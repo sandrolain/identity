@@ -1,20 +1,18 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
-func (a *API) CreateSessionAndJWT(scope string, username string) (string, error) {
+func (a *API) CreateSessionAndJWT(scope sessions.SessionScope, username string) (string, error) {
 	kp := keys.SecureKeyParams{
 		Length:    a.Config.SecureKey.Length,
 		MasterKey: a.Config.SecureKey.MasterKey,
 	}
 	sess, err := a.CreateSession(scope, username, kp)
-	fmt.Printf("sess: %v\n", sess)
 	if err != nil {
 		return "", err
 	}
@@ -25,38 +23,43 @@ func (a *API) CreateSessionAndJWT(scope string, username string) (string, error)
 	return token, nil
 }
 
-func (a *API) CreateSession(scope string, username string, kp keys.SecureKeyParams) (s sessions.Session, err error) {
+func (a *API) CreateSession(scope sessions.SessionScope, username string, kp keys.SecureKeyParams) (s sessions.Session, err error) {
 	var duration time.Duration
 	switch scope {
-	case sessions.SCOPE_OTP:
+	case sessions.ScopeTotp:
 		duration = time.Minute * time.Duration(a.Config.Session.TotpRequestMinutes)
-	case sessions.SCOPE_SESSION:
+	case sessions.ScopeLogin:
 		duration = time.Minute * time.Duration(a.Config.Session.LoginSessionMinutes)
-	case sessions.SCOPE_MACHINE:
+	case sessions.ScopeMachine:
 		duration = time.Minute * time.Duration(a.Config.Session.MachineKeyMinutes)
 	}
 	if s, err = sessions.NewSession(scope, username, duration, kp); err != nil {
 		return
 	}
-	err = a.VolatileStorage.SaveSession(s, duration)
-	fmt.Printf("err: %v\n", err)
+	err = a.VolatileStorage.SaveSession(s)
 	return
 }
 
-func (a *API) GetSession(sessionId string) (sessions.Session, error) {
-	return a.VolatileStorage.GetSession(sessionId)
+func (a *API) GetSession(scope sessions.SessionScope, sessionId string) (s sessions.Session, err error) {
+	s, err = a.VolatileStorage.GetSession(sessionId)
+	if err == nil {
+		return
+	}
+	if scope == sessions.ScopeMachine {
+		s, err = a.PersistentStorage.GetSession(sessionId)
+		if err != nil {
+			a.VolatileStorage.SaveSession(s)
+		}
+	}
+	return
 }
 
-func (a *API) ExtendSession(sessionId string, duration time.Duration) (s sessions.Session, err error) {
-	s, err = a.VolatileStorage.GetSession(sessionId)
-	if err != nil {
-		return s, err
-	}
+func (a *API) ExtendSession(s sessions.Session, duration time.Duration) (sessions.Session, error) {
 	if s.IsExpired() {
 		return s, &sessions.SessionExpiredError{}
 	}
 	s.Extend(duration)
-	if err = a.VolatileStorage.SaveSession(s, duration); err != nil {
+	if err := a.VolatileStorage.SaveSession(s); err != nil {
 		return s, err
 	}
 	return s, nil

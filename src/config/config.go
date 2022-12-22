@@ -96,6 +96,54 @@ type Config struct {
 	SecureKey  SecureKeyConfig
 }
 
+func GetDefaultConfiguration() Config {
+	return Config{
+		AdminGrpc: GrpcConfig{
+			Port:     DEF_GRPC_ADMIN_PORT,
+			CertFile: "",
+			KeyFile:  "",
+		},
+		ClientGrpc: GrpcConfig{
+			Port:     DEF_GRPC_CLIENT_PORT,
+			CertFile: "",
+			KeyFile:  "",
+		},
+		SecureKey: SecureKeyConfig{
+			MasterKey: []byte{},
+			Length:    DEF_KEY_LENGTH,
+		},
+		Totp: TotpConfig{
+			RecoveryTokens: RecoveryTokensConfig{
+				Length: DEF_TOTP_RECOVERY_LENGTH,
+				Size:   DEF_TOTP_RECOVERY_SIZE,
+			},
+			Issuer: DEF_TOTP_ISSUER,
+		},
+		Jwt: JwtConfig{
+			Issuer: DEF_JWT_ISSUER,
+		},
+		Session: SessionConfig{
+			TotpRequestMinutes:  DEF_TOTP_REQUEST_MINUTES,
+			LoginSessionMinutes: DEF_LOGIN_SESSION_MINUTES,
+			MachineKeyMinutes:   DEF_MACHINE_KEY_MINUTES,
+		},
+		Login: LoginConfig{
+			MaxFails:       DEF_LOGIN_MAX_FAILS,
+			LockoutMinutes: DEF_LOGIN_LOCKOUT_MINUTES,
+		},
+		MongoDb: MongoDbConfig{
+			Uri:      "",
+			Database: DEF_MONGOBD_DATABASE,
+			Timeout:  DEF_MONGODB_TIMEOUT,
+		},
+		Redis: RedisConfig{
+			Host:     "",
+			Password: "",
+			Timeout:  DEF_REDIS_TIMEOUT,
+		},
+	}
+}
+
 func GetConfiguration() (cfg Config, err error) {
 	mongoDbURI, err := envutils.RequireEnvString(ENV_MONGODB_URI)
 	if err != nil {
@@ -140,51 +188,17 @@ func GetConfiguration() (cfg Config, err error) {
 		return
 	}
 
-	cfg = Config{
-		AdminGrpc: GrpcConfig{
-			Port:     DEF_GRPC_ADMIN_PORT,
-			CertFile: adminCertFile,
-			KeyFile:  adminKeyFile,
-		},
-		ClientGrpc: GrpcConfig{
-			Port:     DEF_GRPC_CLIENT_PORT,
-			CertFile: clientCertFile,
-			KeyFile:  clientKeyFile,
-		},
-		SecureKey: SecureKeyConfig{
-			MasterKey: mk,
-			Length:    DEF_KEY_LENGTH,
-		},
-		Totp: TotpConfig{
-			RecoveryTokens: RecoveryTokensConfig{
-				Length: DEF_TOTP_RECOVERY_LENGTH,
-				Size:   DEF_TOTP_RECOVERY_SIZE,
-			},
-			Issuer: envutils.GetEnvString(ENV_TOTP_ISSUER, DEF_TOTP_ISSUER),
-		},
-		Jwt: JwtConfig{
-			Issuer: envutils.GetEnvString(ENV_JWT_ISSUER, DEF_JWT_ISSUER),
-		},
-		Session: SessionConfig{
-			TotpRequestMinutes:  DEF_TOTP_REQUEST_MINUTES,
-			LoginSessionMinutes: DEF_LOGIN_SESSION_MINUTES,
-			MachineKeyMinutes:   DEF_MACHINE_KEY_MINUTES,
-		},
-		Login: LoginConfig{
-			MaxFails:       DEF_LOGIN_MAX_FAILS,
-			LockoutMinutes: DEF_LOGIN_LOCKOUT_MINUTES,
-		},
-		MongoDb: MongoDbConfig{
-			Uri:      mongoDbURI,
-			Database: DEF_MONGOBD_DATABASE,
-			Timeout:  DEF_MONGODB_TIMEOUT,
-		},
-		Redis: RedisConfig{
-			Host:     redisHost,
-			Password: redisPassword,
-			Timeout:  DEF_REDIS_TIMEOUT,
-		},
-	}
+	cfg = GetDefaultConfiguration()
+	cfg.AdminGrpc.CertFile = adminCertFile
+	cfg.AdminGrpc.KeyFile = adminKeyFile
+	cfg.ClientGrpc.CertFile = clientCertFile
+	cfg.ClientGrpc.KeyFile = clientKeyFile
+	cfg.SecureKey.MasterKey = mk
+	cfg.Totp.Issuer = envutils.GetEnvString(ENV_TOTP_ISSUER, DEF_TOTP_ISSUER)
+	cfg.Jwt.Issuer = envutils.GetEnvString(ENV_JWT_ISSUER, DEF_JWT_ISSUER)
+	cfg.MongoDb.Uri = mongoDbURI
+	cfg.Redis.Host = redisHost
+	cfg.Redis.Password = redisPassword
 
 	return
 }

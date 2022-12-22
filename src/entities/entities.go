@@ -3,18 +3,21 @@ package entities
 import (
 	"crypto/rand"
 	"fmt"
+	"net/mail"
 	"time"
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
 	"github.com/sandrolain/go-utilities/pkg/jwtutils"
+	"github.com/sandrolain/go-utilities/pkg/pwdutils"
 	"github.com/sandrolain/identity/src/config"
-	"github.com/segmentio/ksuid"
 )
 
+type EntityType int
+
 const (
-	TypeUndefined = iota
+	TypeUndefined EntityType = iota
 	TypeUser
 	TypeMachine
 	TypeAdmin
@@ -26,9 +29,9 @@ type EntityRoles []EntityRole
 
 type Entity struct {
 	Id             string      `json:"id" bson:"_id"`
-	Type           int         `json:"type" bson:"type"`
+	Type           EntityType  `json:"type" bson:"type"`
 	PasswordHash   []byte      `json:"passwordHash" bson:"passwordHash"`
-	Machine        bool        `json:"machine" bson:"machine"`
+	Suspended      bool        `json:"suspended" bson:"suspended"`
 	TotpConfigured bool        `json:"totpConfigured" bson:"totpConfigured"`
 	TotpUri        string      `json:"totpUri" bson:"totpUri"`
 	RecoveryTokens []string    `json:"recoveryTokens" bson:"recoveryTokens"`
@@ -36,11 +39,8 @@ type Entity struct {
 }
 
 func ValidEntityId(entityId string) bool {
-	return len(entityId) >= 3
-}
-
-func ValidPassword(password string) bool {
-	return len(password) >= 10 // TODO: move to config parameter
+	_, err := mail.ParseAddress(entityId)
+	return err == nil
 }
 
 type TotpParams struct {
@@ -48,33 +48,39 @@ type TotpParams struct {
 	Issuer  string
 }
 
-func CreateEntity(entityId string, password string, totpConfig config.TotpConfig) (u Entity, err error) {
+func NewEntity(typ EntityType, entityId string, password string, totpConfig config.TotpConfig) (u Entity, err error) {
 	u = Entity{
+		Type:  typ,
 		Id:    entityId,
 		Roles: make(EntityRoles, 0),
 	}
 
 	if !ValidEntityId(u.Id) {
-		return u, fmt.Errorf(`invalid entity ID "%s"`, u.Id)
-	}
-
-	if password == "" {
-		password = ksuid.New().String()
-	}
-
-	if !ValidPassword(password) {
-		return u, fmt.Errorf(`invalid password for entity "%s"`, u.Id)
+		err = fmt.Errorf(`invalid entity ID "%s"`, u.Id)
+		return
 	}
 
 	if err = u.SetPassword(password); err != nil {
-		return u, err
+		return
 	}
 
 	if err = u.ResetTotp(totpConfig); err != nil {
-		return u, err
+		return
 	}
 
-	return u, nil
+	return
+}
+
+func (u *Entity) Suspend() {
+	u.Suspended = true
+}
+
+func (u *Entity) Enable() {
+	u.Suspended = false
+}
+
+func (u *Entity) IsEnabled() bool {
+	return !u.Suspended
 }
 
 func (u *Entity) IsUser() bool {
@@ -90,20 +96,28 @@ func (u *Entity) IsAdmin() bool {
 }
 
 func (u *Entity) SetPassword(password string) (err error) {
+	if password == "" {
+		password, err = pwdutils.Generate(16)
+	} else if err = pwdutils.Validate(password); err != nil {
+		err = fmt.Errorf("invalid password: %v", err)
+	}
+
+	if err != nil {
+		return
+	}
+
 	hashBytes, err := cryptoutils.BcryptHash([]byte(password))
 	if err != nil {
 		return
 	}
+
 	u.PasswordHash = hashBytes
-	return nil
+
+	return
 }
 
 func (u *Entity) HasPassword(password string) bool {
 	return cryptoutils.BcryptCompare([]byte(password), u.PasswordHash)
-}
-
-func (u *Entity) SetMachine(machine bool) {
-	u.Machine = machine
 }
 
 func (u *Entity) ResetTotp(config config.TotpConfig) error {
@@ -128,6 +142,14 @@ func (u *Entity) ValidateTotp(code string) (bool, error) {
 		return false, err
 	}
 	return totp.Validate(code, key.Secret()), nil
+}
+
+func (u *Entity) GenerateTotp() (code string, err error) {
+	key, err := otp.NewKeyFromURL(u.TotpUri)
+	if err != nil {
+		return
+	}
+	return totp.GenerateCodeCustom(key.Secret(), time.Now(), totp.ValidateOpts{})
 }
 
 func (u *Entity) SetTotpConfigured(configured bool) {

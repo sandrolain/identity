@@ -1,12 +1,11 @@
 package main
 
 import (
-	"crypto/tls"
-	"fmt"
 	"log"
 	"sync"
 	"time"
 
+	"github.com/sandrolain/go-utilities/pkg/debugutils"
 	"github.com/sandrolain/identity/src/api"
 	"github.com/sandrolain/identity/src/config"
 	"github.com/sandrolain/identity/src/grpc/admingrpc"
@@ -20,14 +19,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot load environment configuration: %v", err)
 	}
-	fmt.Printf("cfg: %+v\n", cfg)
+	debugutils.PrintJSON(cfg)
 
 	mongodbStorage, err := mongostorage.CreateMongoDBStorage(cfg.MongoDb.Uri, cfg.MongoDb.Database, time.Duration(cfg.MongoDb.Timeout)*time.Second)
 	if err != nil {
 		log.Fatalf("cannot create MongoDB storage client: %v", err)
 	}
 
-	redisStorage, err := redisstorage.CreateRedisStorage(cfg.Redis.Host, cfg.Redis.Password, &tls.Config{}, time.Duration(cfg.Redis.Timeout)*time.Second)
+	redisStorage, err := redisstorage.CreateRedisStorage(cfg.Redis.Host, cfg.Redis.Password, nil, time.Duration(cfg.Redis.Timeout)*time.Second)
 	if err != nil {
 		log.Fatalf("cannot create Redis storage client: %v", err)
 	}

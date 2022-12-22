@@ -23,9 +23,11 @@ type MongoDBStorage struct {
 	client *mongoutils.Client
 }
 
-func (s *MongoDBStorage) Setup() error {
-	_, err := s.client.AssertIndex(SESSIONS_COLLECTION, "entityId")
-	if err != nil {
+func (s *MongoDBStorage) Setup() (err error) {
+	if _, err := s.client.AssertIndex(SESSIONS_COLLECTION, "entityId"); err != nil {
+		return err
+	}
+	if _, err := s.client.AssertTtlIndex(SESSIONS_COLLECTION, "expire", 1); err != nil {
 		return err
 	}
 	return nil
