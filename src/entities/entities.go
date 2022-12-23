@@ -24,8 +24,7 @@ const (
 )
 
 type EntityMetadata map[string]string
-type EntityRole string
-type EntityRoles []EntityRole
+type EntityRoles []string
 
 type Entity struct {
 	Id             string      `json:"id" bson:"_id"`
@@ -64,8 +63,10 @@ func NewEntity(typ EntityType, entityId string, password string, totpConfig conf
 		return
 	}
 
-	if err = u.ResetTotp(totpConfig); err != nil {
-		return
+	if typ != TypeMachine {
+		if err = u.ResetTotp(totpConfig); err != nil {
+			return
+		}
 	}
 
 	return

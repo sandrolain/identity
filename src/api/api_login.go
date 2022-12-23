@@ -16,9 +16,11 @@ type LoginTotpResult struct {
 }
 
 type EntityDetailsResult struct {
-	EntityId string
-	Type     entities.EntityType
-	Roles    entities.EntityRoles
+	EntityId       string
+	Type           entities.EntityType
+	Roles          entities.EntityRoles
+	TotpConfigured bool
+	TotpUri        string
 }
 
 func (a *API) Login(entityType entities.EntityType, entityId string, password string) (res LoginResult, err error) {
@@ -37,7 +39,7 @@ func (a *API) Login(entityType entities.EntityType, entityId string, password st
 		return
 	}
 
-	token, err := a.CreateSessionAndJWT(sessions.ScopeTotp, u.Id)
+	token, _, err := a.CreateSessionAndJWT(sessions.ScopeTotp, u.Id)
 	if err != nil {
 		return
 	}
@@ -66,7 +68,12 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 		return
 	}
 
-	token, err = a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)
+	if !u.TotpConfigured {
+		u.SetTotpConfigured(true)
+		a.PersistentStorage.SaveEntity(u)
+	}
+
+	token, _, err = a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)
 	if err != nil {
 		return
 	}
@@ -77,12 +84,17 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 }
 
 func (a *API) GetEntityDetails(token string) (res EntityDetailsResult, err error) {
-	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
+	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
 	}
 	res.EntityId = u.Id
 	res.Type = u.Type
 	res.Roles = u.Roles
+	res.TotpConfigured = u.TotpConfigured
+	if !u.TotpConfigured {
+		res.TotpUri = u.TotpUri
+	}
+	a.ExtendSession(s)
 	return
 }

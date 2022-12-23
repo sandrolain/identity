@@ -9,7 +9,7 @@ import (
 )
 
 func TestKeyCreate(t *testing.T) {
-	mk := cryptoutils.RandomBytes(32)
+	mk := MasterKeyFromBytes(cryptoutils.RandomBytes(32))
 	keyLen := 32
 
 	k := NewKey("foo", keyLen)
@@ -60,7 +60,7 @@ func TestKeyCreate(t *testing.T) {
 }
 
 func TestSecureKeyCreate(t *testing.T) {
-	mk := cryptoutils.RandomBytes(32)
+	mk := MasterKeyFromBytes(cryptoutils.RandomBytes(32))
 	keyLen := 32
 
 	sk, err := NewSecureKey("foo", SecureKeyParams{keyLen, mk})
@@ -79,24 +79,11 @@ func TestSecureKeyCreate(t *testing.T) {
 }
 
 func TestSecuringErrors(t *testing.T) {
-	mk := cryptoutils.RandomBytes(32)
-	badMk := cryptoutils.RandomBytes(31)
+	mk := MasterKeyFromBytes(cryptoutils.RandomBytes(32))
 	keyLen := 32
 
-	k := NewKey("foo", keyLen)
-
-	_, err := k.Secure(badMk)
-	if err == nil {
-		t.Fatal("Securing key with bad master key length should generate an error")
-	}
-
-	sk, err := NewSecureKey("foo", SecureKeyParams{keyLen, mk})
+	_, err := NewSecureKey("foo", SecureKeyParams{keyLen, mk})
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	_, err = sk.Unsecure(badMk)
-	if err == nil {
-		t.Fatal("Unecuring key with bad master key length should generate an error")
 	}
 }

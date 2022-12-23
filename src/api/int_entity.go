@@ -7,16 +7,19 @@ import (
 	"github.com/sandrolain/identity/src/entities"
 )
 
-func (a *API) CreateEntity(typ entities.EntityType, username string, password string) (u entities.Entity, err error) {
-	_, err = a.GetEntityById(username)
+func (a *API) CreateEntity(typ entities.EntityType, entityId string, password string, roles entities.EntityRoles) (u entities.Entity, err error) {
+	_, err = a.GetEntityById(entityId)
 	if err == nil {
-		err = fmt.Errorf(`entity "%s" already exist`, username)
+		err = fmt.Errorf(`entity "%s" already exist`, entityId)
 		return
 	} else if !crudutils.IsNotFound(err) {
 		return
 	}
-	if u, err = entities.NewEntity(typ, username, password, a.Config.Totp); err != nil {
+	if u, err = entities.NewEntity(typ, entityId, password, a.Config.Totp); err != nil {
 		return
+	}
+	if len(roles) > 0 {
+		u.AddRoles(roles)
 	}
 	return u, a.PersistentStorage.SaveEntity(u)
 }
@@ -35,20 +38,7 @@ func (a *API) SetEntityPassword(username string, password string) (u entities.En
 	return u, a.PersistentStorage.SaveEntity(u)
 }
 
-func (a *API) SetEntityTotpConfigured(username string, configured bool) (u entities.Entity, err error) {
-	if u, err = a.PersistentStorage.GetEntity(username); err != nil {
-		return u, err
-	}
-	u.SetTotpConfigured(configured)
-	return u, a.PersistentStorage.SaveEntity(u)
-}
-
-func (a *API) GetEntityTotpUri(username string) (string, error) {
-	u, err := a.PersistentStorage.GetEntity(username)
-	return u.TotpUri, err
-}
-
-func (a *API) ResetEntityOTP(username string) (u entities.Entity, err error) {
+func (a *API) ResetEntityTotp(username string) (u entities.Entity, err error) {
 	if u, err = a.PersistentStorage.GetEntity(username); err != nil {
 		return u, err
 	}
@@ -56,14 +46,6 @@ func (a *API) ResetEntityOTP(username string) (u entities.Entity, err error) {
 		return u, err
 	}
 	return u, a.PersistentStorage.SaveEntity(u)
-}
-
-func (a *API) IsEntityTotpToConfigure(username string) (bool, error) {
-	u, err := a.PersistentStorage.GetEntity(username)
-	if err != nil {
-		return false, err
-	}
-	return u.IsTotpToConfigure(), nil
 }
 
 func (a *API) DeleteEntity(username string) error {

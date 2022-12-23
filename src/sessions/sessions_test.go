@@ -10,7 +10,7 @@ import (
 func getKeyParams() keys.SecureKeyParams {
 	return keys.SecureKeyParams{
 		Length:    32,
-		MasterKey: keys.NewKey("foo", 32).Value,
+		MasterKey: keys.MasterKeyFromBytes(keys.GenerateKeyValue(32)),
 	}
 }
 
@@ -150,7 +150,7 @@ func TestSessionJWT(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	jwt, err := sess.CreateSessionJWT("issuer.com", kp)
+	jwt, err := sess.CreateSessionJWT("issuer.com", kp.MasterKey)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -16,14 +16,37 @@ message LoginResponse {
 
 message LoginConfirmRequest {
   string totpToken = 1;
-  string totp = 2;
+  string totpCode = 2;
 }
 
 message LoginConfirmResponse {
   string sessionToken = 1;
 }
 
+message InitMachineSessionRequest {
+  string sessionToken = 1;
+  string machineId = 2;
+}
+
+message InitMachineSessionResponse {
+  string machineId = 1;
+  string sessionId = 2;
+  bytes secret = 3;
+}
+
+message InsertMachineRequest {
+  string sessionToken = 1;
+  string email = 2;
+  repeated string roles = 3;
+}
+
+message InsertMachineResponse {
+  string machineId = 1;
+}
+
 service AdminService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
+  rpc InsertMachine(InsertMachineRequest) returns (InsertMachineResponse);
+  rpc InitMachineSession(InitMachineSessionRequest) returns (InitMachineSessionResponse);
 }

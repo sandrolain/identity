@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sandrolain/go-utilities/pkg/envutils"
+	"github.com/sandrolain/identity/src/keys"
 )
 
 const (
@@ -68,9 +69,10 @@ type TotpConfig struct {
 type JwtConfig struct {
 	Issuer string
 }
+
 type SecureKeyConfig struct {
 	Length    int
-	MasterKey []byte
+	MasterKey keys.MasterKey
 }
 
 type SessionConfig struct {
@@ -109,7 +111,7 @@ func GetDefaultConfiguration() Config {
 			KeyFile:  "",
 		},
 		SecureKey: SecureKeyConfig{
-			MasterKey: []byte{},
+			MasterKey: [32]byte{},
 			Length:    DEF_KEY_LENGTH,
 		},
 		Totp: TotpConfig{
@@ -193,7 +195,7 @@ func GetConfiguration() (cfg Config, err error) {
 	cfg.AdminGrpc.KeyFile = adminKeyFile
 	cfg.ClientGrpc.CertFile = clientCertFile
 	cfg.ClientGrpc.KeyFile = clientKeyFile
-	cfg.SecureKey.MasterKey = mk
+	cfg.SecureKey.MasterKey = keys.MasterKeyFromBytes(mk)
 	cfg.Totp.Issuer = envutils.GetEnvString(ENV_TOTP_ISSUER, DEF_TOTP_ISSUER)
 	cfg.Jwt.Issuer = envutils.GetEnvString(ENV_JWT_ISSUER, DEF_JWT_ISSUER)
 	cfg.MongoDb.Uri = mongoDbURI

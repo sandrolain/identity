@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ClientServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error)
+	GetUserDetails(ctx context.Context, in *GetUserDetailsRequest, opts ...grpc.CallOption) (*GetUserDetailsResponse, error)
 }
 
 type clientServiceClient struct {
@@ -52,12 +53,22 @@ func (c *clientServiceClient) LoginConfirm(ctx context.Context, in *LoginConfirm
 	return out, nil
 }
 
+func (c *clientServiceClient) GetUserDetails(ctx context.Context, in *GetUserDetailsRequest, opts ...grpc.CallOption) (*GetUserDetailsResponse, error) {
+	out := new(GetUserDetailsResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/GetUserDetails", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClientServiceServer is the server API for ClientService service.
 // All implementations must embed UnimplementedClientServiceServer
 // for forward compatibility
 type ClientServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error)
+	GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error)
 	mustEmbedUnimplementedClientServiceServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedClientServiceServer) Login(context.Context, *LoginRequest) (*
 }
 func (UnimplementedClientServiceServer) LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginConfirm not implemented")
+}
+func (UnimplementedClientServiceServer) GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserDetails not implemented")
 }
 func (UnimplementedClientServiceServer) mustEmbedUnimplementedClientServiceServer() {}
 
@@ -120,6 +134,24 @@ func _ClientService_LoginConfirm_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_GetUserDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).GetUserDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/GetUserDetails",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).GetUserDetails(ctx, req.(*GetUserDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClientService_ServiceDesc is the grpc.ServiceDesc for ClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginConfirm",
 			Handler:    _ClientService_LoginConfirm_Handler,
+		},
+		{
+			MethodName: "GetUserDetails",
+			Handler:    _ClientService_GetUserDetails_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

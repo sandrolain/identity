@@ -92,8 +92,8 @@ func (s *Session) GetEntityname() string {
 	return s.EntityId
 }
 
-func (s *Session) CreateSessionJWT(issuer string, kp keys.SecureKeyParams) (string, error) {
-	key, err := s.Key.Unsecure(kp.MasterKey)
+func (s *Session) CreateSessionJWT(issuer string, mk keys.MasterKey) (string, error) {
+	key, err := s.Key.Unsecure(mk)
 	if err != nil {
 		return "", err
 	}

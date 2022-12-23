@@ -8,6 +8,13 @@ import (
 	"github.com/sandrolain/go-utilities/pkg/encodeutils"
 )
 
+type MasterKey [32]byte
+
+func MasterKeyFromBytes(in []byte) (res MasterKey) {
+	copy(res[:], in[:32])
+	return
+}
+
 func GenerateKeyValue(length int) []byte {
 	b := make([]byte, length)
 	rand.Read(b)
@@ -25,7 +32,7 @@ func NewKey(name string, length int) *Key {
 
 type SecureKeyParams struct {
 	Length    int
-	MasterKey []byte
+	MasterKey MasterKey
 }
 
 func NewSecureKey(name string, p SecureKeyParams) (*SecuredKey, error) {
@@ -52,7 +59,7 @@ func (k *Key) ValueBase64() string {
 	return encodeutils.Base64Encode(k.Value)
 }
 
-func (k *Key) Secure(masterKey []byte) (*SecuredKey, error) {
+func (k *Key) Secure(masterKey MasterKey) (*SecuredKey, error) {
 	sec, hash, err := cryptoutils.EncryptWithHash(k.Value, masterKey)
 	if err != nil {
 		return nil, err
@@ -72,7 +79,7 @@ type SecuredKey struct {
 	Created time.Time `json:"created" bson:"created"`
 }
 
-func (k *SecuredKey) Unsecure(masterKey []byte) (*Key, error) {
+func (k *SecuredKey) Unsecure(masterKey [32]byte) (*Key, error) {
 	dec, err := cryptoutils.DecryptAndVerify(k.Value, masterKey, k.Hash)
 	if err != nil {
 		return nil, err

@@ -10,15 +10,15 @@ func (u *Entity) GetRoles() EntityRoles {
 	return u.Roles
 }
 
-func (u *Entity) getRolesMap() map[EntityRole]bool {
-	r := make(map[EntityRole]bool)
+func (u *Entity) getRolesMap() map[string]bool {
+	r := make(map[string]bool)
 	for _, value := range u.Roles {
 		r[value] = true
 	}
 	return r
 }
 
-func (u *Entity) HasRole(role EntityRole) bool {
+func (u *Entity) HasRole(role string) bool {
 	m := u.getRolesMap()
 	_, ok := m[role]
 	return ok
@@ -39,11 +39,11 @@ func (u *Entity) SetRoles(roles EntityRoles) {
 	u.Roles = roles
 }
 
-func (u *Entity) AddRoles(roles EntityRoles) {
+func (u *Entity) AddRoles(roles []string) {
 	u.Roles = append(u.Roles, roles...)
 }
 
-func (u *Entity) DeleteRole(role EntityRole) {
+func (u *Entity) DeleteRole(role string) {
 	roles := make(EntityRoles, 0)
 	for _, value := range u.Roles {
 		if value != role {
@@ -55,4 +55,10 @@ func (u *Entity) DeleteRole(role EntityRole) {
 
 func (u *Entity) ResetRoles() {
 	u.Roles = make(EntityRoles, 0)
+}
+
+func (r *EntityRoles) StringSlice() (res []string) {
+	res = make([]string, len(*r))
+	copy(res, *r)
+	return
 }

@@ -34,7 +34,7 @@ func (a *API) AuthenticateWithSessionJWT(scope sessions.SessionScope, token stri
 	}
 
 	if s.IsExpired() {
-		err = crudutils.NotFound(info.Subject)
+		err = crudutils.ExpiredResource(s.Id)
 		return
 	}
 
