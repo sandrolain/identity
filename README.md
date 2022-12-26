@@ -2,19 +2,31 @@
 
 Identity Service as GoLang Exercise
 
+## ToDo
+
+- [ ] Env Config: Password Strength validation
+- [ ] Bot APIs: IP validation
+- WebAuthn
+  - [ ] WebAuthn: Association
+  - [ ] WebAuthn: Login
+- [ ] gRPC: mTLS 
+- [ ] Roles package
+- [ ] Admin APIs authorized with roles
 
 ## Premises
 
 - Zero trust
-- Minimal
+- Opinionated approach
 - Environment variables as Configuration input
 - Strong inputs validation
-- Required 2FA 
-- Authenticate gRPC as communication channel
-- Separated gRPC ports for admin and clients
+- Required 2FA with TOTP
+  - 2FA Secret regenerated until first successful 2FA login
+- Authenticated gRPC as communication channel
+- Separated gRPC ports for administration and public clients
 - Session IDs as authentication Keys for everything
   - For sending 2FA without resend credentials
   - For Users' short session
+  - For Users' token association (WebAuthn)
   - For Machines' long session
 - Entities:
   - Admin: Login via dedicated channel
@@ -28,10 +40,9 @@ Identity Service as GoLang Exercise
     - can manage other users
     - can manage machines and Sessions
 - Username must be a valid email
-- Keys rotation for User Session JWT sign
+- WebAuthn
 - Technologies:
   - JWT for session ID tokens
-  - TOTP for 2FA
   - WebAuthn for Users authentication
   - Redis for short persistence and caching
   - MongoDB for long persistence

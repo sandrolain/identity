@@ -2,7 +2,6 @@ package storage
 
 import (
 	"github.com/sandrolain/identity/src/entities"
-	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -24,7 +23,4 @@ type VolatileStorage interface {
 	DeleteSession(sessionId string) error
 	GetEntitySessions(entityId string) ([]sessions.Session, error)
 	DeleteEntitySessions(entityId string) error
-
-	GetExpiringKeys(scope string) (keys.ExpiringKeyList, error)
-	SaveExpiringKeys(scope string, keysList keys.ExpiringKeyList) error
 }

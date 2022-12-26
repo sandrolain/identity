@@ -12,6 +12,7 @@ import (
 	"github.com/sandrolain/go-utilities/pkg/jwtutils"
 	"github.com/sandrolain/go-utilities/pkg/pwdutils"
 	"github.com/sandrolain/identity/src/config"
+	"github.com/sandrolain/identity/src/roles"
 )
 
 type EntityType int
@@ -24,7 +25,6 @@ const (
 )
 
 type EntityMetadata map[string]string
-type EntityRoles []string
 
 type Entity struct {
 	Id             string      `json:"id" bson:"_id"`
@@ -34,7 +34,7 @@ type Entity struct {
 	TotpConfigured bool        `json:"totpConfigured" bson:"totpConfigured"`
 	TotpUri        string      `json:"totpUri" bson:"totpUri"`
 	RecoveryTokens []string    `json:"recoveryTokens" bson:"recoveryTokens"`
-	Roles          EntityRoles `json:"roles" bson:"roles"`
+	Roles          roles.Roles `json:"roles" bson:"roles"`
 }
 
 func ValidEntityId(entityId string) bool {
@@ -51,7 +51,7 @@ func NewEntity(typ EntityType, entityId string, password string, totpConfig conf
 	u = Entity{
 		Type:  typ,
 		Id:    entityId,
-		Roles: make(EntityRoles, 0),
+		Roles: roles.Roles{},
 	}
 
 	if !ValidEntityId(u.Id) {
@@ -150,7 +150,11 @@ func (u *Entity) GenerateTotp() (code string, err error) {
 	if err != nil {
 		return
 	}
-	return totp.GenerateCodeCustom(key.Secret(), time.Now(), totp.ValidateOpts{})
+	return totp.GenerateCodeCustom(key.Secret(), time.Now(), totp.ValidateOpts{
+		Period:    uint(key.Period()),
+		Digits:    key.Digits(),
+		Algorithm: key.Algorithm(),
+	})
 }
 
 func (u *Entity) SetTotpConfigured(configured bool) {

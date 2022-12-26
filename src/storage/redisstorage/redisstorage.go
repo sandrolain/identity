@@ -7,7 +7,6 @@ import (
 
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/go-utilities/pkg/redisutils"
-	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
 	"github.com/sandrolain/identity/src/storage"
 )
@@ -44,14 +43,6 @@ func (s *RedisStorage) DeleteSession(sessionId string) error {
 }
 func (s *RedisStorage) DeleteEntitySessions(entityId string) error {
 	// TODO:
-	return nil
-}
-
-func (s *RedisStorage) GetExpiringKeys(scope string) (keys.ExpiringKeyList, error) {
-	// TODO:
-	return keys.ExpiringKeyList{}, crudutils.NotFound(scope)
-}
-func (s *RedisStorage) SaveExpiringKeys(scope string, keysList keys.ExpiringKeyList) error {
 	return nil
 }
 

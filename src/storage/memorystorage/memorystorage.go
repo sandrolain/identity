@@ -3,7 +3,6 @@ package memorystorage
 import (
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/entities"
-	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -11,7 +10,6 @@ type MemoryStorage struct {
 	entities         map[string]entities.Entity
 	sessions         map[string]sessions.Session
 	entitiesSessions map[string]map[string]bool
-	expKeys          map[string]keys.ExpiringKeyList
 }
 
 func (s *MemoryStorage) GetEntity(entityId string) (u entities.Entity, err error) {
@@ -72,22 +70,10 @@ func (s *MemoryStorage) DeleteEntitySessions(entityId string) error {
 	return nil
 }
 
-func (s *MemoryStorage) GetExpiringKeys(scope string) (keys.ExpiringKeyList, error) {
-	if u, ok := s.expKeys[scope]; ok {
-		return u, nil
-	}
-	return keys.ExpiringKeyList{}, crudutils.NotFound(scope)
-}
-func (s *MemoryStorage) SaveExpiringKeys(scope string, keysList keys.ExpiringKeyList) error {
-	s.expKeys[scope] = keysList
-	return nil
-}
-
 func CreateMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
 		entities:         make(map[string]entities.Entity),
 		sessions:         make(map[string]sessions.Session),
 		entitiesSessions: make(map[string]map[string]bool),
-		expKeys:          make(map[string]keys.ExpiringKeyList),
 	}
 }

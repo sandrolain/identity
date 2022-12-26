@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/entities"
+	"github.com/sandrolain/identity/src/roles"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -18,7 +19,7 @@ type LoginTotpResult struct {
 type EntityDetailsResult struct {
 	EntityId       string
 	Type           entities.EntityType
-	Roles          entities.EntityRoles
+	Roles          roles.Roles
 	TotpConfigured bool
 	TotpUri        string
 }
@@ -47,6 +48,14 @@ func (a *API) Login(entityType entities.EntityType, entityId string, password st
 	res.TotpToken = token
 
 	if !u.TotpConfigured {
+		err = u.ResetTotp(a.Config.Totp)
+		if err != nil {
+			return
+		}
+		err = a.PersistentStorage.SaveEntity(u)
+		if err != nil {
+			return
+		}
 		res.TotpUri = u.TotpUri
 	}
 
@@ -70,7 +79,10 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 
 	if !u.TotpConfigured {
 		u.SetTotpConfigured(true)
-		a.PersistentStorage.SaveEntity(u)
+		err = a.PersistentStorage.SaveEntity(u)
+		if err != nil {
+			return
+		}
 	}
 
 	token, _, err = a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)

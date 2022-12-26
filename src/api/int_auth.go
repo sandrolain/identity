@@ -8,15 +8,16 @@ import (
 	"github.com/sandrolain/identity/src/sessions"
 )
 
-func (a *API) AuthenticateWithCredentials(entityId string, password string) (*entities.Entity, error) {
-	u, err := a.PersistentStorage.GetEntity(entityId)
+func (a *API) AuthenticateWithCredentials(entityId string, password string) (u entities.Entity, err error) {
+	u, err = a.PersistentStorage.GetEntity(entityId)
 	if err != nil {
-		return nil, err
+		return
 	}
 	if !u.HasPassword(password) {
-		return nil, crudutils.NotFound(entityId)
+		err = crudutils.NotFound(entityId)
+		return
 	}
-	return &u, nil
+	return
 }
 
 func (a *API) AuthenticateWithSessionJWT(scope sessions.SessionScope, token string) (u entities.Entity, s sessions.Session, err error) {

@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/entities"
+	"github.com/sandrolain/identity/src/roles"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -10,7 +11,7 @@ type InsertMachineResult struct {
 	MachineId string
 }
 
-func (a *API) InsertMachine(token string, entityId string, roles []string) (res InsertMachineResult, err error) {
+func (a *API) InsertMachine(token string, entityId string, roles roles.Roles) (res InsertMachineResult, err error) {
 	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return

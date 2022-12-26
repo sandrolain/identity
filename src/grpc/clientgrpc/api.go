@@ -33,7 +33,7 @@ func (s clientgrpcServer) GetUserDetails(ctx context.Context, req *GetUserDetail
 		res = &GetUserDetailsResponse{
 			Id:             r.EntityId,
 			Type:           int32(r.Type),
-			Roles:          r.Roles.StringSlice(),
+			Roles:          res.Roles,
 			TotpConfigured: r.TotpConfigured,
 			TotpUri:        r.TotpUri,
 		}
