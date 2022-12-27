@@ -15,9 +15,9 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.19
-      - name: Set up vendor
-        run: go mod vendor
-      - name: Test
+      - name: Set up dependencies
+        run: sh ./dependencies.sh
+      - name: Run Tests
         run: sh ./test.sh
       - name: Build
         run: sh ./build.sh
