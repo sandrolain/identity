@@ -1,0 +1,11 @@
+name: Main Workflow
+on:
+  - push
+jobs:
+  say-hello:
+    name: Say Hello
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Say Hello
+        run: echo "Hello"
