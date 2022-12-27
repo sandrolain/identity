@@ -67,7 +67,6 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 	if err != nil {
 		return
 	}
-
 	totpOk, err := u.ValidateTotp(otp)
 	if err != nil {
 		return

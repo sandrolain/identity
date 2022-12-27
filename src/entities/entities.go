@@ -142,7 +142,11 @@ func (u *Entity) ValidateTotp(code string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return totp.Validate(code, key.Secret()), nil
+	return totp.ValidateCustom(code, key.Secret(), time.Now(), totp.ValidateOpts{
+		Period:    uint(key.Period()),
+		Digits:    key.Digits(),
+		Algorithm: key.Algorithm(),
+	})
 }
 
 func (u *Entity) GenerateTotp() (code string, err error) {

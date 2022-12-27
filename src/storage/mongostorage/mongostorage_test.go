@@ -8,7 +8,7 @@ import (
 )
 
 func checkStorageInterface(s storage.PersistentStorage) {
-	s.GetEntity("hello")
+	return
 }
 
 func TestStorageInterface(t *testing.T) {

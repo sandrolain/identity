@@ -15,17 +15,17 @@ func getKeyParams() keys.SecureKeyParams {
 }
 
 func TestSessionCreate(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, username, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if sess.EntityId != username {
-		t.Fatalf(`Expect "%s" to be equal to "%s"`, sess.EntityId, username)
+	if sess.EntityId != entityId {
+		t.Fatalf(`Expect "%s" to be equal to "%s"`, sess.EntityId, entityId)
 	}
 
 	limit := time.Now().Add(duration)
@@ -35,10 +35,10 @@ func TestSessionCreate(t *testing.T) {
 }
 
 func TestSessionIsValid(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, username, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
@@ -56,10 +56,10 @@ func TestSessionIsValid(t *testing.T) {
 }
 
 func TestSessionExtend(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, username, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
@@ -79,10 +79,10 @@ func TestSessionExtend(t *testing.T) {
 }
 
 func TestSessionIsExpired(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, username, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
@@ -100,10 +100,10 @@ func TestSessionIsExpired(t *testing.T) {
 }
 
 func TestSessionGetID(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, username, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +113,7 @@ func TestSessionGetID(t *testing.T) {
 		t.Fatalf(`Expect "%s" to be not empty`, sess.GetID())
 	}
 
-	sess2, err := NewSession(scope, username, duration, getKeyParams())
+	sess2, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
@@ -125,26 +125,26 @@ func TestSessionGetID(t *testing.T) {
 }
 
 func TestSessionGetEntityname(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, username, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, getKeyParams())
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if sess.GetEntityname() != username {
-		t.Fatalf(`Expect "%s" to be equal to "%s"`, sess.GetEntityname(), username)
+	if sess.GetEntityname() != entityId {
+		t.Fatalf(`Expect "%s" to be equal to "%s"`, sess.GetEntityname(), entityId)
 	}
 }
 
 func TestSessionJWT(t *testing.T) {
-	username := "john"
+	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
 	kp := getKeyParams()
-	sess, err := NewSession(scope, username, duration, kp)
+	sess, err := NewSession(scope, entityId, duration, kp)
 
 	if err != nil {
 		t.Fatal(err)

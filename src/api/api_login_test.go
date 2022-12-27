@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
@@ -45,6 +44,11 @@ func TestUserLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		u, err = storage.GetEntity(u.Id)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		code, err := u.GenerateTotp()
 		if err != nil {
 			t.Fatal(err)
@@ -59,7 +63,10 @@ func TestUserLogin(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		fmt.Printf("res3: %v\n", res3)
+
+		if res3.EntityId != u.Id {
+			t.Fatalf("entity details not match: %v != %v", res3.EntityId, u.Id)
+		}
 	}
 
 	{
@@ -103,6 +110,11 @@ func TestAdminLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		u, err = storage.GetEntity(u.Id)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		code, err := u.GenerateTotp()
 		if err != nil {
 			t.Fatal(err)
@@ -117,7 +129,10 @@ func TestAdminLogin(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		fmt.Printf("res3: %v\n", res3)
+
+		if res3.EntityId != u.Id {
+			t.Fatalf("entity details not match: %v != %v", res3.EntityId, u.Id)
+		}
 	}
 
 	{
