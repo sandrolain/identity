@@ -7,26 +7,45 @@ import (
 	"github.com/sandrolain/identity/src/sessions"
 )
 
-type InsertMachineResult struct {
-	MachineId string
+type CreateUserResult struct {
+	UserId string
 }
 
-func (a *API) InsertMachine(token string, entityId string, roles roles.Roles) (res InsertMachineResult, err error) {
+func (a *API) CreateUser(token string, entityId string, machineRoles roles.Roles) (res CreateUserResult, err error) {
 	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
 	}
-	if !u.IsAdmin() {
+	if !u.IsAdmin() || !u.Roles.Has(roles.RoleMachinesManager) {
 		err = crudutils.NotAuthorized("")
 		return
 	}
-	e, err := a.CreateEntity(entities.TypeMachine, entityId, "", roles)
+	e, err := a.CreateEntity(entities.TypeUser, entityId, "", machineRoles)
 	if err != nil {
 		return
 	}
-	res = InsertMachineResult{
-		MachineId: e.Id,
+	res.UserId = e.Id
+	return
+}
+
+type CreateMachineResult struct {
+	MachineId string
+}
+
+func (a *API) CreateMachine(token string, entityId string, machineRoles roles.Roles) (res CreateMachineResult, err error) {
+	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
+	if err != nil {
+		return
 	}
+	if !u.IsAdmin() || !u.Roles.Has(roles.RoleMachinesManager) {
+		err = crudutils.NotAuthorized("")
+		return
+	}
+	e, err := a.CreateEntity(entities.TypeMachine, entityId, "", machineRoles)
+	if err != nil {
+		return
+	}
+	res.MachineId = e.Id
 	return
 }
 
@@ -41,7 +60,7 @@ func (a *API) InitMachineSession(token string, entityId string) (res MachineSess
 	if err != nil {
 		return
 	}
-	if !u.IsAdmin() {
+	if !u.IsAdmin() || !u.Roles.Has(roles.RoleMachinesManager) {
 		err = crudutils.NotAuthorized("")
 		return
 	}

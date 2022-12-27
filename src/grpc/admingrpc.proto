@@ -34,19 +34,19 @@ message InitMachineSessionResponse {
   bytes secret = 3;
 }
 
-message InsertMachineRequest {
+message CreateMachineRequest {
   string sessionToken = 1;
   string email = 2;
   repeated string roles = 3;
 }
 
-message InsertMachineResponse {
+message CreateMachineResponse {
   string machineId = 1;
 }
 
 service AdminService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
-  rpc InsertMachine(InsertMachineRequest) returns (InsertMachineResponse);
+  rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse);
   rpc InitMachineSession(InitMachineSessionRequest) returns (InitMachineSessionResponse);
 }

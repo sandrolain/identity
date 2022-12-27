@@ -9,9 +9,21 @@ Identity Service as GoLang Exercise
 - WebAuthn
   - [ ] WebAuthn: Association
   - [ ] WebAuthn: Login
-- [ ] gRPC: mTLS 
+- [ ] gRPC: mTLS
 - [ ] Roles package
 - [ ] Admin APIs authorized with roles
+- User:
+  - [ ] Password reset
+  - [ ] Logout
+- Admin:
+  - [ ] Edit user
+  - [ ] Edit machine
+  - [ ] List Entities
+  - [ ] Create Admin
+  - [ ] Edit Admin
+  - [ ] Reset machine sessions
+  - [ ] List machine sessions
+  - [ ] Logout
 
 ## Premises
 
@@ -27,6 +39,7 @@ Identity Service as GoLang Exercise
   - For sending 2FA without resend credentials
   - For Users' short session
   - For Users' token association (WebAuthn)
+  - For Users' password reset
   - For Machines' long session
 - Entities:
   - Admin: Login via dedicated channel

@@ -1,9 +1,8 @@
 package roles
 
 const (
-	ROLE_USERS_MANAGER    = "ROLE_USERS_MNG"
-	ROLE_SESSIONS_MANAGER = "ROLE_SESSIONS_MNG"
-	ROLE_KEYS_MANAGER     = "ROLE_KEYS_MNG"
+	RoleUsersManager    = "ROLE_USERS_MNG"
+	RoleMachinesManager = "ROLE_MACHINES_MNG"
 )
 
 type Roles struct {

@@ -28,10 +28,10 @@ func (s admingrpcServer) LoginConfirm(ctx context.Context, req *LoginConfirmRequ
 	return
 }
 
-func (s admingrpcServer) InsertMachine(ctx context.Context, req *InsertMachineRequest) (res *InsertMachineResponse, err error) {
-	r, err := s.Api.InsertMachine(req.SessionToken, req.Email, roles.Roles{})
+func (s admingrpcServer) CreateMachine(ctx context.Context, req *CreateMachineRequest) (res *CreateMachineResponse, err error) {
+	r, err := s.Api.CreateMachine(req.SessionToken, req.Email, roles.Roles{})
 	if err == nil {
-		res = &InsertMachineResponse{
+		res = &CreateMachineResponse{
 			MachineId: r.MachineId,
 		}
 	}

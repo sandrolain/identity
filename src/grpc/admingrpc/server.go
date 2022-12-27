@@ -11,8 +11,8 @@ import (
 )
 
 type admingrpcServer struct {
-	Api *api.API
 	UnimplementedAdminServiceServer
+	Api *api.API
 }
 
 func StartServer(a *api.API) error {
