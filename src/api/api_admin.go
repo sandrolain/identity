@@ -76,7 +76,7 @@ func (a *API) InitMachineSession(token string, entityId string) (res MachineSess
 	if err != nil {
 		return
 	}
-	k, err := sess.Key.Unsecure(a.Config.SecureKey.MasterKey)
+	k, err := sess.Key.Unsecure(a.Config.Keys.MasterKey)
 	if err != nil {
 		return
 	}

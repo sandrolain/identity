@@ -9,10 +9,14 @@ import (
 )
 
 func TestKeyCreate(t *testing.T) {
-	mk := MasterKeyFromBytes(cryptoutils.RandomBytes(32))
+	byt, err := cryptoutils.RandomBytes(32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	mk := MasterKeyFromBytes(byt)
 	keyLen := 32
 
-	k := NewKey("foo", keyLen)
+	k, _ := NewKey(keyLen)
 
 	if len(k.Value) != keyLen {
 		t.Fatalf("Expected key value length of %v but found %v", keyLen, len(k.Value))
@@ -41,17 +45,9 @@ func TestKeyCreate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if k.Name != sk.Name {
-		t.Fatalf("Expected same name %v but found %v", k.Name, sk.Name)
-	}
-
 	k2, err := sk.Unsecure(mk)
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	if k.Name != k2.Name {
-		t.Fatalf("Expected same name %v but found %v", k.Name, k2.Name)
 	}
 
 	if !bytes.Equal(k.Value, k2.Value) {
@@ -60,10 +56,14 @@ func TestKeyCreate(t *testing.T) {
 }
 
 func TestSecureKeyCreate(t *testing.T) {
-	mk := MasterKeyFromBytes(cryptoutils.RandomBytes(32))
+	byt, err := cryptoutils.RandomBytes(32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	mk := MasterKeyFromBytes(byt)
 	keyLen := 32
 
-	sk, err := NewSecureKey("foo", SecureKeyParams{keyLen, mk})
+	sk, err := NewSecureKey(keyLen, mk)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,10 +79,14 @@ func TestSecureKeyCreate(t *testing.T) {
 }
 
 func TestSecuringErrors(t *testing.T) {
-	mk := MasterKeyFromBytes(cryptoutils.RandomBytes(32))
+	byt, err := cryptoutils.RandomBytes(32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	mk := MasterKeyFromBytes(byt)
 	keyLen := 32
 
-	_, err := NewSecureKey("foo", SecureKeyParams{keyLen, mk})
+	_, err = NewSecureKey(keyLen, mk)
 	if err != nil {
 		t.Fatal(err)
 	}

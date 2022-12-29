@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
-	"github.com/sandrolain/identity/src/keys"
+	"github.com/sandrolain/go-utilities/pkg/logutils"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -13,7 +13,7 @@ func (a *API) CreateSessionAndJWT(scope sessions.SessionScope, username string) 
 	if err != nil {
 		return "", sess, err
 	}
-	mk := a.Config.SecureKey.MasterKey
+	mk := a.Config.Keys.MasterKey
 	token, err := sess.CreateSessionJWT(a.Config.Jwt.Issuer, mk)
 	if err != nil {
 		return "", sess, err
@@ -34,12 +34,8 @@ func (a *API) GetSessionScopeDuration(scope sessions.SessionScope) (dur time.Dur
 }
 
 func (a *API) CreateSession(scope sessions.SessionScope, username string) (s sessions.Session, err error) {
-	kp := keys.SecureKeyParams{
-		Length:    a.Config.SecureKey.Length,
-		MasterKey: a.Config.SecureKey.MasterKey,
-	}
 	duration := a.GetSessionScopeDuration(scope)
-	if s, err = sessions.NewSession(scope, username, duration, kp); err != nil {
+	if s, err = sessions.NewSession(scope, username, duration, a.Config.Keys.MasterKey); err != nil {
 		return
 	}
 	err = a.VolatileStorage.SaveSession(s)
@@ -57,7 +53,10 @@ func (a *API) GetSession(scope sessions.SessionScope, sessionId string) (s sessi
 	if scope == sessions.ScopeMachine {
 		s, err = a.PersistentStorage.GetSession(sessionId)
 		if err != nil {
-			a.VolatileStorage.SaveSession(s)
+			nbErr := a.VolatileStorage.SaveSession(s)
+			if nbErr != nil {
+				logutils.Error("cannot save session to volatile storage", nbErr)
+			}
 		}
 	}
 	return

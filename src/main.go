@@ -1,11 +1,10 @@
 package main
 
 import (
-	"log"
 	"sync"
 	"time"
 
-	"github.com/sandrolain/go-utilities/pkg/debugutils"
+	"github.com/sandrolain/go-utilities/pkg/logutils"
 	"github.com/sandrolain/identity/src/api"
 	"github.com/sandrolain/identity/src/config"
 	"github.com/sandrolain/identity/src/grpc/admingrpc"
@@ -15,20 +14,21 @@ import (
 )
 
 func main() {
+	logutils.InitLogger()
+
 	cfg, err := config.GetConfiguration()
 	if err != nil {
-		log.Fatalf("cannot load environment configuration: %v", err)
+		logutils.Fatalf("cannot load environment configuration: %v", err)
 	}
-	debugutils.PrintJSON(cfg)
 
 	mongodbStorage, err := mongostorage.CreateMongoDBStorage(cfg.MongoDb.Uri, cfg.MongoDb.Database, time.Duration(cfg.MongoDb.Timeout)*time.Second)
 	if err != nil {
-		log.Fatalf("cannot create MongoDB storage client: %v", err)
+		logutils.Fatalf("cannot create MongoDB storage client: %v", err)
 	}
 
 	redisStorage, err := redisstorage.CreateRedisStorage(cfg.Redis.Host, cfg.Redis.Password, nil, time.Duration(cfg.Redis.Timeout)*time.Second)
 	if err != nil {
-		log.Fatalf("cannot create Redis storage client: %v", err)
+		logutils.Fatalf("cannot create Redis storage client: %v", err)
 	}
 
 	api := &api.API{
@@ -43,7 +43,7 @@ func main() {
 	go func() {
 		err = admingrpc.StartServer(api)
 		if err != nil {
-			log.Fatalf("cannot start admin gRPC server: %v", err)
+			logutils.Fatalf("cannot start admin gRPC server: %v", err)
 		}
 		wg.Done()
 	}()
@@ -51,7 +51,7 @@ func main() {
 	go func() {
 		err = clientgrpc.StartServer(api)
 		if err != nil {
-			log.Fatalf("cannot start client gRPC server: %v", err)
+			logutils.Fatalf("cannot start client gRPC server: %v", err)
 		}
 		wg.Done()
 	}()

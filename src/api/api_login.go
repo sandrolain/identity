@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/roles"
@@ -106,6 +108,9 @@ func (a *API) GetEntityDetails(token string) (res EntityDetailsResult, err error
 	if !u.TotpConfigured {
 		res.TotpUri = u.TotpUri
 	}
-	a.ExtendSession(s)
+	_, err = a.ExtendSession(s)
+	if err != nil {
+		log.Print(err)
+	}
 	return
 }

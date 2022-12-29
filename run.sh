@@ -1,5 +1,6 @@
 #!/bin/sh
 
-export $(grep -v '^#' .env | xargs)
+# export $(grep -v '^#' .env | xargs)
+# go run ./src
 
-go run ./src
+air

@@ -1,7 +1,6 @@
 package keys
 
 import (
-	"crypto/rand"
 	"time"
 
 	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
@@ -15,38 +14,30 @@ func MasterKeyFromBytes(in []byte) (res MasterKey) {
 	return
 }
 
-func GenerateKeyValue(length int) []byte {
-	b := make([]byte, length)
-	rand.Read(b)
-	return b
-}
-
-func NewKey(name string, length int) *Key {
-	// TODO: name validation
+func NewKey(length int) (*Key, error) {
+	keyValue, err := cryptoutils.RandomBytes(length)
+	if err != nil {
+		return nil, err
+	}
 	return &Key{
-		Name:    name,
-		Value:   GenerateKeyValue(length),
+		Value:   keyValue,
 		Created: time.Now(),
+	}, nil
+}
+
+func NewSecureKey(length int, mk MasterKey) (*SecuredKey, error) {
+	keyValue, err := cryptoutils.RandomBytes(length)
+	if err != nil {
+		return nil, err
 	}
-}
-
-type SecureKeyParams struct {
-	Length    int
-	MasterKey MasterKey
-}
-
-func NewSecureKey(name string, p SecureKeyParams) (*SecuredKey, error) {
-	// TODO: name validation
 	key := &Key{
-		Name:    name,
-		Value:   GenerateKeyValue(p.Length),
+		Value:   keyValue,
 		Created: time.Now(),
 	}
-	return key.Secure(p.MasterKey)
+	return key.Secure(mk)
 }
 
 type Key struct {
-	Name    string    `json:"name" bson:"name"`
 	Value   []byte    `json:"value" bson:"value"`
 	Created time.Time `json:"created" bson:"created"`
 }
@@ -65,7 +56,6 @@ func (k *Key) Secure(masterKey MasterKey) (*SecuredKey, error) {
 		return nil, err
 	}
 	return &SecuredKey{
-		Name:    k.Name,
 		Value:   sec,
 		Hash:    hash,
 		Created: k.Created,
@@ -85,7 +75,6 @@ func (k *SecuredKey) Unsecure(masterKey [32]byte) (*Key, error) {
 		return nil, err
 	}
 	return &Key{
-		Name:    k.Name,
 		Value:   dec,
 		Created: k.Created,
 	}, nil

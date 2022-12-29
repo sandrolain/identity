@@ -132,7 +132,12 @@ func (u *Entity) ResetTotp(config config.TotpConfig) error {
 
 	u.TotpConfigured = false
 	u.TotpUri = key.URL()
-	u.RecoveryTokens = generateRecoveryTokens(config.RecoveryTokens)
+
+	recTokens, err := generateRecoveryTokens(config.RecoveryTokens)
+	if err != nil {
+		return err
+	}
+	u.RecoveryTokens = recTokens
 
 	return nil
 }
@@ -186,12 +191,15 @@ func ParseTotpJWT(jwtString string, secret []byte) (string, error) {
 	})
 }
 
-func generateRecoveryTokens(cfg config.RecoveryTokensConfig) []string {
+func generateRecoveryTokens(cfg config.RecoveryTokensConfig) ([]string, error) {
 	tokens := make([]string, cfg.Length)
 	for i := 0; i < cfg.Length; i++ {
 		b := make([]byte, cfg.Size)
-		rand.Read(b)
+		_, err := rand.Read(b)
+		if err != nil {
+			return tokens, err
+		}
 		tokens[i] = fmt.Sprintf("%x", b)
 	}
-	return tokens
+	return tokens, nil
 }

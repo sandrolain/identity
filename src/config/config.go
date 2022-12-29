@@ -95,7 +95,7 @@ type Config struct {
 	Jwt        JwtConfig
 	Session    SessionConfig
 	Login      LoginConfig
-	SecureKey  SecureKeyConfig
+	Keys       SecureKeyConfig
 }
 
 func GetDefaultConfiguration() Config {
@@ -110,9 +110,8 @@ func GetDefaultConfiguration() Config {
 			CertFile: "",
 			KeyFile:  "",
 		},
-		SecureKey: SecureKeyConfig{
+		Keys: SecureKeyConfig{
 			MasterKey: [32]byte{},
-			Length:    DEF_KEY_LENGTH,
 		},
 		Totp: TotpConfig{
 			RecoveryTokens: RecoveryTokensConfig{
@@ -195,7 +194,7 @@ func GetConfiguration() (cfg Config, err error) {
 	cfg.AdminGrpc.KeyFile = adminKeyFile
 	cfg.ClientGrpc.CertFile = clientCertFile
 	cfg.ClientGrpc.KeyFile = clientKeyFile
-	cfg.SecureKey.MasterKey = keys.MasterKeyFromBytes(mk)
+	cfg.Keys.MasterKey = keys.MasterKeyFromBytes(mk)
 	cfg.Totp.Issuer = envutils.GetEnvString(ENV_TOTP_ISSUER, DEF_TOTP_ISSUER)
 	cfg.Jwt.Issuer = envutils.GetEnvString(ENV_JWT_ISSUER, DEF_JWT_ISSUER)
 	cfg.MongoDb.Uri = mongoDbURI

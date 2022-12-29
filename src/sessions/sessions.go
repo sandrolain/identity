@@ -41,7 +41,7 @@ func ValidScope(scope SessionScope) bool {
 }
 
 // NewSession create a new Session object with the username and duration specified
-func NewSession(scope SessionScope, username string, duration time.Duration, kp keys.SecureKeyParams) (s Session, err error) {
+func NewSession(scope SessionScope, username string, duration time.Duration, mk keys.MasterKey) (s Session, err error) {
 	if !ValidScope(scope) {
 		return s, fmt.Errorf(`Invalid Session Scope "%s"`, scope)
 	}
@@ -49,7 +49,7 @@ func NewSession(scope SessionScope, username string, duration time.Duration, kp 
 		return s, fmt.Errorf(`Invalid Session Entityname "%s"`, username)
 	}
 	id := ksuid.New().String()
-	key, err := keys.NewSecureKey(id, kp)
+	key, err := keys.NewSecureKey(32, mk)
 	if err != nil {
 		return s, err
 	}
@@ -106,8 +106,8 @@ func (s *Session) CreateSessionJWT(issuer string, mk keys.MasterKey) (string, er
 	})
 }
 
-func (s *Session) VerifySessionJWT(jwtString string, kp keys.SecureKeyParams) error {
-	key, err := s.Key.Unsecure(kp.MasterKey)
+func (s *Session) VerifySessionJWT(jwtString string, mk keys.MasterKey) error {
+	key, err := s.Key.Unsecure(mk)
 	if err != nil {
 		return err
 	}

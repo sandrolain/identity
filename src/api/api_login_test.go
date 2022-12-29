@@ -12,8 +12,12 @@ import (
 )
 
 func TestUserLogin(t *testing.T) {
+	key, err := cryptoutils.RandomBytes(32)
+	if err != nil {
+		t.Fatal(err)
+	}
 	cfg := config.GetDefaultConfiguration()
-	cfg.SecureKey.MasterKey = keys.MasterKeyFromBytes(cryptoutils.RandomBytes(32))
+	cfg.Keys.MasterKey = keys.MasterKeyFromBytes(key)
 
 	storage := memorystorage.CreateMemoryStorage()
 
@@ -78,8 +82,12 @@ func TestUserLogin(t *testing.T) {
 }
 
 func TestAdminLogin(t *testing.T) {
+	key, err := cryptoutils.RandomBytes(32)
+	if err != nil {
+		t.Fatal(err)
+	}
 	cfg := config.GetDefaultConfiguration()
-	cfg.SecureKey.MasterKey = keys.MasterKeyFromBytes(cryptoutils.RandomBytes(32))
+	cfg.Keys.MasterKey = keys.MasterKeyFromBytes(key)
 
 	storage := memorystorage.CreateMemoryStorage()
 

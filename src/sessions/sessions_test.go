@@ -4,21 +4,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
 	"github.com/sandrolain/identity/src/keys"
 )
 
-func getKeyParams() keys.SecureKeyParams {
-	return keys.SecureKeyParams{
-		Length:    32,
-		MasterKey: keys.MasterKeyFromBytes(keys.GenerateKeyValue(32)),
+func generateMasterKey(t *testing.T) keys.MasterKey {
+	byt, err := cryptoutils.RandomBytes(32)
+	if err != nil {
+		t.Fatal(err)
 	}
+	return keys.MasterKeyFromBytes(byt)
 }
 
 func TestSessionCreate(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -35,10 +39,12 @@ func TestSessionCreate(t *testing.T) {
 }
 
 func TestSessionIsValid(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -56,10 +62,12 @@ func TestSessionIsValid(t *testing.T) {
 }
 
 func TestSessionExtend(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -79,10 +87,12 @@ func TestSessionExtend(t *testing.T) {
 }
 
 func TestSessionIsExpired(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -100,10 +110,12 @@ func TestSessionIsExpired(t *testing.T) {
 }
 
 func TestSessionGetID(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +125,7 @@ func TestSessionGetID(t *testing.T) {
 		t.Fatalf(`Expect "%s" to be not empty`, sess.GetID())
 	}
 
-	sess2, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess2, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -125,10 +137,12 @@ func TestSessionGetID(t *testing.T) {
 }
 
 func TestSessionGetEntityname(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, getKeyParams())
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -140,22 +154,23 @@ func TestSessionGetEntityname(t *testing.T) {
 }
 
 func TestSessionJWT(t *testing.T) {
+	mk := generateMasterKey(t)
+
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	kp := getKeyParams()
-	sess, err := NewSession(scope, entityId, duration, kp)
+	sess, err := NewSession(scope, entityId, duration, mk)
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	jwt, err := sess.CreateSessionJWT("issuer.com", kp.MasterKey)
+	jwt, err := sess.CreateSessionJWT("issuer.com", mk)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = sess.VerifySessionJWT(jwt, kp)
+	err = sess.VerifySessionJWT(jwt, mk)
 	if err != nil {
 		t.Fatal(err)
 	}

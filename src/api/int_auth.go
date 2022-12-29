@@ -4,7 +4,6 @@ import (
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/go-utilities/pkg/jwtutils"
 	"github.com/sandrolain/identity/src/entities"
-	"github.com/sandrolain/identity/src/keys"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
@@ -39,12 +38,7 @@ func (a *API) AuthenticateWithSessionJWT(scope sessions.SessionScope, token stri
 		return
 	}
 
-	kp := keys.SecureKeyParams{
-		Length:    a.Config.SecureKey.Length,
-		MasterKey: a.Config.SecureKey.MasterKey,
-	}
-
-	if err = s.VerifySessionJWT(token, kp); err != nil {
+	if err = s.VerifySessionJWT(token, a.Config.Keys.MasterKey); err != nil {
 		return
 	}
 
