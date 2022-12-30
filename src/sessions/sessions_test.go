@@ -22,7 +22,7 @@ func TestSessionCreate(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -44,7 +44,7 @@ func TestSessionIsValid(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func TestSessionExtend(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -92,7 +92,7 @@ func TestSessionIsExpired(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -115,7 +115,7 @@ func TestSessionGetID(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -125,7 +125,7 @@ func TestSessionGetID(t *testing.T) {
 		t.Fatalf(`Expect "%s" to be not empty`, sess.GetID())
 	}
 
-	sess2, err := NewSession(scope, entityId, duration, mk)
+	sess2, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -142,7 +142,7 @@ func TestSessionGetEntityname(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)
@@ -159,7 +159,7 @@ func TestSessionJWT(t *testing.T) {
 	entityId := "john@doe.com"
 	scope := ScopeLogin
 	duration, _ := time.ParseDuration("30m")
-	sess, err := NewSession(scope, entityId, duration, mk)
+	sess, err := NewSession(scope, entityId, duration, []string{}, mk)
 
 	if err != nil {
 		t.Fatal(err)

@@ -63,7 +63,7 @@ func TestUserLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		res3, err := a.GetEntityDetails(res2.SessionToken)
+		res3, err := a.GetUserDetails(res2.SessionToken)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -133,7 +133,7 @@ func TestAdminLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		res3, err := a.GetEntityDetails(res2.SessionToken)
+		res3, err := a.GetUserDetails(res2.SessionToken)
 		if err != nil {
 			t.Fatal(err)
 		}

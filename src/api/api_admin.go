@@ -55,7 +55,7 @@ type MachineSessionResult struct {
 	Secret    []byte
 }
 
-func (a *API) InitMachineSession(token string, entityId string) (res MachineSessionResult, err error) {
+func (a *API) InitMachineSession(token string, entityId string, allowedIps []string) (res MachineSessionResult, err error) {
 	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
@@ -72,7 +72,7 @@ func (a *API) InitMachineSession(token string, entityId string) (res MachineSess
 		err = crudutils.InvalidValue(entityId)
 		return
 	}
-	sess, err := a.CreateSession(sessions.ScopeLogin, u.Id)
+	sess, err := a.CreateSession(sessions.ScopeLogin, u.Id, allowedIps)
 	if err != nil {
 		return
 	}

@@ -39,7 +39,7 @@ func (s admingrpcServer) CreateMachine(ctx context.Context, req *CreateMachineRe
 }
 
 func (s admingrpcServer) InitMachineSession(ctx context.Context, req *InitMachineSessionRequest) (res *InitMachineSessionResponse, err error) {
-	r, err := s.Api.InitMachineSession(req.SessionToken, req.MachineId)
+	r, err := s.Api.InitMachineSession(req.SessionToken, req.MachineId, req.AllowedIps)
 	if err == nil {
 		res = &InitMachineSessionResponse{
 			MachineId: r.MachineId,

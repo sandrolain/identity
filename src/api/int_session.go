@@ -9,7 +9,7 @@ import (
 )
 
 func (a *API) CreateSessionAndJWT(scope sessions.SessionScope, username string) (string, sessions.Session, error) {
-	sess, err := a.CreateSession(scope, username)
+	sess, err := a.CreateSession(scope, username, []string{})
 	if err != nil {
 		return "", sess, err
 	}
@@ -33,9 +33,9 @@ func (a *API) GetSessionScopeDuration(scope sessions.SessionScope) (dur time.Dur
 	return
 }
 
-func (a *API) CreateSession(scope sessions.SessionScope, username string) (s sessions.Session, err error) {
+func (a *API) CreateSession(scope sessions.SessionScope, username string, allowedIps []string) (s sessions.Session, err error) {
 	duration := a.GetSessionScopeDuration(scope)
-	if s, err = sessions.NewSession(scope, username, duration, a.Config.Keys.MasterKey); err != nil {
+	if s, err = sessions.NewSession(scope, username, duration, allowedIps, a.Config.Keys.MasterKey); err != nil {
 		return
 	}
 	err = a.VolatileStorage.SaveSession(s)

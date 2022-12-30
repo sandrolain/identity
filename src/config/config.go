@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sandrolain/go-utilities/pkg/envutils"
+	"github.com/sandrolain/go-utilities/pkg/pwdutils"
 	"github.com/sandrolain/identity/src/keys"
 )
 
@@ -145,47 +146,77 @@ func GetDefaultConfiguration() Config {
 	}
 }
 
+func formatError(env string, err error) error {
+	return fmt.Errorf(`invalid "%v" configuration: %v`, env, err)
+}
+
 func GetConfiguration() (cfg Config, err error) {
 	mongoDbURI, err := envutils.RequireEnvString(ENV_MONGODB_URI)
 	if err != nil {
+		err = formatError(ENV_MONGODB_URI, err)
+		return
+	}
+
+	mongoPassword, err := pwdutils.ExtractPasswordFromURI(mongoDbURI)
+	if err != nil {
+		err = formatError(ENV_MONGODB_URI, err)
+		return
+	}
+
+	err = pwdutils.Validate(mongoPassword)
+	if err != nil {
+		err = formatError(ENV_MONGODB_URI, err)
 		return
 	}
 
 	redisHost, err := envutils.RequireEnvString(ENV_REDIS_HOST)
 	if err != nil {
+		err = formatError(ENV_REDIS_HOST, err)
 		return
 	}
 
 	redisPassword, err := envutils.RequireEnvString(ENV_REDIS_PASSWORD)
 	if err != nil {
+		err = formatError(ENV_REDIS_PASSWORD, err)
+		return
+	}
+
+	err = pwdutils.Validate(redisPassword)
+	if err != nil {
+		err = formatError(ENV_REDIS_PASSWORD, err)
 		return
 	}
 
 	mk, err := envutils.RequireEnvBase64(ENV_MASTER_KEY_B64)
 	if err != nil {
+		err = formatError(ENV_MASTER_KEY_B64, err)
 		return
 	}
 	mkl := len(mk)
 	if mkl != 32 {
-		err = fmt.Errorf("invalid Master Key length: %v", mkl)
+		err = formatError(ENV_MASTER_KEY_B64, fmt.Errorf("invalid Master Key length: %v", mkl))
 		return
 	}
 
 	adminCertFile, err := envutils.RequireEnvPath(ENV_ADMIN_CERT_FILE)
 	if err != nil {
+		err = formatError(ENV_ADMIN_CERT_FILE, err)
 		return
 	}
 	adminKeyFile, err := envutils.RequireEnvPath(ENV_ADMIN_KEY_FILE)
 	if err != nil {
+		err = formatError(ENV_ADMIN_KEY_FILE, err)
 		return
 	}
 
 	clientCertFile, err := envutils.RequireEnvPath(ENV_CLIENT_CERT_FILE)
 	if err != nil {
+		err = formatError(ENV_CLIENT_CERT_FILE, err)
 		return
 	}
 	clientKeyFile, err := envutils.RequireEnvPath(ENV_CLIENT_KEY_FILE)
 	if err != nil {
+		err = formatError(ENV_CLIENT_KEY_FILE, err)
 		return
 	}
 

@@ -26,6 +26,7 @@ message LoginConfirmResponse {
 message InitMachineSessionRequest {
   string sessionToken = 1;
   string machineId = 2;
+  repeated string allowedIps = 3;
 }
 
 message InitMachineSessionResponse {

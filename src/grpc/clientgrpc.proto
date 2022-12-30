@@ -35,8 +35,22 @@ message GetUserDetailsResponse {
   string totpUri = 5;
 }
 
+message AuthenticateMachineRequest {
+  string machineToken = 1;
+  string email = 2;
+  string ip = 3;
+}
+
+message AuthenticateMachineResponse {
+  string id = 1;
+  int32 type = 2;
+  repeated string roles = 3;
+}
+
+
 service ClientService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
   rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
+  rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
 }

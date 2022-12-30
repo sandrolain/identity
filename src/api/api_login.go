@@ -1,9 +1,8 @@
 package api
 
 import (
-	"log"
-
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
+	"github.com/sandrolain/go-utilities/pkg/logutils"
 	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/roles"
 	"github.com/sandrolain/identity/src/sessions"
@@ -96,7 +95,7 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 	return
 }
 
-func (a *API) GetEntityDetails(token string) (res EntityDetailsResult, err error) {
+func (a *API) GetUserDetails(token string) (res EntityDetailsResult, err error) {
 	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
@@ -110,7 +109,7 @@ func (a *API) GetEntityDetails(token string) (res EntityDetailsResult, err error
 	}
 	_, err = a.ExtendSession(s)
 	if err != nil {
-		log.Print(err)
+		logutils.Error("cannot extend Entity session", err)
 	}
 	return
 }

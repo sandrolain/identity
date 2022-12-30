@@ -2,9 +2,9 @@ package clientgrpc
 
 import (
 	"fmt"
-	"log"
 	"net"
 
+	"github.com/sandrolain/go-utilities/pkg/logutils"
 	"github.com/sandrolain/identity/src/api"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -18,7 +18,7 @@ type clientgrpcServer struct {
 func StartServer(a *api.API) error {
 	cfg := a.Config.ClientGrpc
 	address := fmt.Sprintf("localhost:%d", cfg.Port)
-	log.Printf("start gRPC server on %v", address)
+	logutils.Infof("starting client gRPC server on %v", address)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)

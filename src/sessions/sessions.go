@@ -24,14 +24,13 @@ func (m *SessionExpiredError) Error() string {
 	return "Session Expired"
 }
 
-type SessionIP string
+type SessionIP = string
 type SessionIPs []SessionIP
 type Session struct {
 	Id         string          `json:"_id" bson:"_id"`
 	Scope      SessionScope    `json:"scope" bson:"scope"`
 	EntityId   string          `json:"entityId" bson:"entityId"`
 	Expire     time.Time       `json:"expire" bson:"expire"`
-	Machine    bool            `json:"machine" bson:"machine"`
 	AllowedIPs SessionIPs      `json:"allowedIps" bson:"allowedIps"`
 	Key        keys.SecuredKey `json:"key" bson:"key"`
 }
@@ -41,7 +40,7 @@ func ValidScope(scope SessionScope) bool {
 }
 
 // NewSession create a new Session object with the username and duration specified
-func NewSession(scope SessionScope, username string, duration time.Duration, mk keys.MasterKey) (s Session, err error) {
+func NewSession(scope SessionScope, username string, duration time.Duration, allowedIps []string, mk keys.MasterKey) (s Session, err error) {
 	if !ValidScope(scope) {
 		return s, fmt.Errorf(`Invalid Session Scope "%s"`, scope)
 	}
@@ -55,11 +54,12 @@ func NewSession(scope SessionScope, username string, duration time.Duration, mk 
 	}
 	expire := time.Now().Add(duration)
 	return Session{
-		Id:       id,
-		Scope:    scope,
-		EntityId: username,
-		Expire:   expire,
-		Key:      *key,
+		Id:         id,
+		Scope:      scope,
+		EntityId:   username,
+		Expire:     expire,
+		AllowedIPs: SessionIPs(allowedIps),
+		Key:        *key,
 	}, nil
 }
 
