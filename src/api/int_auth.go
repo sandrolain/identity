@@ -24,12 +24,17 @@ func (a *API) AuthenticateWithSessionJWT(scope sessions.SessionScope, token stri
 	if err != nil {
 		return
 	}
-	if info.Scope != string(scope) {
+	infoSubject, err := sessions.ParseScopeSubject(info.Subject)
+	if err != nil {
+		return
+	}
+
+	if infoSubject.Scope != string(scope) {
 		err = crudutils.NotFound(info.Subject)
 		return
 	}
 
-	if s, err = a.GetSession(scope, info.Subject); err != nil {
+	if s, err = a.GetSession(scope, infoSubject.SessionId); err != nil {
 		return
 	}
 

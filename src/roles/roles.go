@@ -18,8 +18,8 @@ func (u *Roles) Has(role string) bool {
 	return false
 }
 
-func (u *Roles) HasAll(roles Roles) bool {
-	for _, r := range roles.list {
+func (u *Roles) HasAll(roles ...string) bool {
+	for _, r := range roles {
 		if !u.Has(r) {
 			return false
 		}
@@ -27,12 +27,12 @@ func (u *Roles) HasAll(roles Roles) bool {
 	return true
 }
 
-func (u *Roles) Set(roles Roles) {
-	u.list = roles.list
+func (u *Roles) Set(roles ...string) {
+	u.list = roles
 }
 
-func (u *Roles) Add(roles Roles) {
-	u.list = append(u.list, roles.list...)
+func (u *Roles) Add(roles ...string) {
+	u.list = append(u.list, roles...)
 }
 
 func (u *Roles) Delete(role string) {

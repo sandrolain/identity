@@ -32,7 +32,8 @@ message InitMachineSessionRequest {
 message InitMachineSessionResponse {
   string machineId = 1;
   string sessionId = 2;
-  bytes secret = 3;
+  string subject = 3;
+  bytes secret = 4;
 }
 
 message CreateMachineRequest {

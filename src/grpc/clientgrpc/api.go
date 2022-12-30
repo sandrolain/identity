@@ -45,7 +45,7 @@ func (s clientgrpcServer) AuthenticateMachine(ctx context.Context, req *Authenti
 	r, err := s.Api.AuthenticateMachine(req.MachineToken, req.Email, req.Ip)
 	if err == nil {
 		res = &AuthenticateMachineResponse{
-			Id:    r.EntityId,
+			Id:    r.MachineId,
 			Type:  int32(r.Type),
 			Roles: res.Roles,
 		}

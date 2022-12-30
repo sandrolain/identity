@@ -2,6 +2,7 @@ package sessions
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sandrolain/go-utilities/pkg/jwtutils"
@@ -92,6 +93,10 @@ func (s *Session) GetEntityname() string {
 	return s.EntityId
 }
 
+func (s *Session) GetJwtSubject() string {
+	return fmt.Sprintf("%s:%s", s.Scope, s.Id)
+}
+
 func (s *Session) CreateSessionJWT(issuer string, mk keys.MasterKey) (string, error) {
 	key, err := s.Key.Unsecure(mk)
 	if err != nil {
@@ -101,8 +106,7 @@ func (s *Session) CreateSessionJWT(issuer string, mk keys.MasterKey) (string, er
 		ExpiresAt: s.Expire,
 		Issuer:    issuer,
 		Secret:    key.Value,
-		Scope:     string(s.Scope),
-		Subject:   s.Id,
+		Subject:   s.GetJwtSubject(),
 	})
 }
 
@@ -111,15 +115,37 @@ func (s *Session) VerifySessionJWT(jwtString string, mk keys.MasterKey) error {
 	if err != nil {
 		return err
 	}
-	sessionId, err := jwtutils.ParseJWT(jwtString, jwtutils.JWTParams{
+	subject, err := jwtutils.ParseJWT(jwtString, jwtutils.JWTParams{
 		Secret: key.Value,
-		Scope:  string(s.Scope),
 	})
 	if err != nil {
 		return err
 	}
-	if sessionId != s.Id {
-		return fmt.Errorf("JWT Session ID not match")
+	subj, err := ParseScopeSubject(subject)
+	if err != nil {
+		return err
+	}
+	if string(s.Scope) != subj.Scope {
+		return fmt.Errorf(`JWT scope "%s" not as expected "%s"`, subj.Scope, s.Scope)
+	}
+	if s.Id != subj.SessionId {
+		return fmt.Errorf(`JWT Session ID "%s" not match "%s"`, subj.SessionId, s.Id)
 	}
 	return nil
+}
+
+type ScopeSubject struct {
+	Scope     string
+	SessionId string
+}
+
+func ParseScopeSubject(subject string) (res ScopeSubject, err error) {
+	i := strings.Index(subject, ":")
+	if i < 0 {
+		err = fmt.Errorf(`invalid JWT subject "%s"`, subject)
+		return
+	}
+	res.Scope = subject[:i]
+	res.SessionId = subject[i+1:]
+	return
 }

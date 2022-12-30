@@ -8,9 +8,9 @@ import (
 )
 
 type AuthenticateMachineResult struct {
-	EntityId string
-	Type     entities.EntityType
-	Roles    roles.Roles
+	MachineId string
+	Type      entities.EntityType
+	Roles     roles.Roles
 }
 
 func (a *API) AuthenticateMachine(token string, email string, ip string) (res AuthenticateMachineResult, err error) {
@@ -32,7 +32,7 @@ func (a *API) AuthenticateMachine(token string, email string, ip string) (res Au
 		return
 	}
 
-	res.EntityId = u.Id
+	res.MachineId = u.Id
 	res.Type = u.Type
 	res.Roles = u.Roles
 

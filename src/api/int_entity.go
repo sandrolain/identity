@@ -5,10 +5,9 @@ import (
 
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/entities"
-	"github.com/sandrolain/identity/src/roles"
 )
 
-func (a *API) CreateEntity(typ entities.EntityType, entityId string, password string, roles roles.Roles) (u entities.Entity, err error) {
+func (a *API) CreateEntity(typ entities.EntityType, entityId string, password string, roles []string) (u entities.Entity, err error) {
 	_, err = a.GetEntityById(entityId)
 	if err == nil {
 		err = fmt.Errorf(`entity "%s" already exist`, entityId)
@@ -19,8 +18,8 @@ func (a *API) CreateEntity(typ entities.EntityType, entityId string, password st
 	if u, err = entities.NewEntity(typ, entityId, password, a.Config.Totp); err != nil {
 		return
 	}
-	if roles.Length() > 0 {
-		u.Roles.Add(roles)
+	if len(roles) > 0 {
+		u.Roles.Add(roles...)
 	}
 	return u, a.PersistentStorage.SaveEntity(u)
 }

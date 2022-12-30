@@ -1,6 +1,8 @@
 package api
 
 import (
+	"time"
+
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/roles"
@@ -11,7 +13,7 @@ type CreateUserResult struct {
 	UserId string
 }
 
-func (a *API) CreateUser(token string, entityId string, machineRoles roles.Roles) (res CreateUserResult, err error) {
+func (a *API) CreateUser(token string, entityId string, machineRoles []string) (res CreateUserResult, err error) {
 	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
@@ -32,7 +34,7 @@ type CreateMachineResult struct {
 	MachineId string
 }
 
-func (a *API) CreateMachine(token string, entityId string, machineRoles roles.Roles) (res CreateMachineResult, err error) {
+func (a *API) CreateMachine(token string, entityId string, machineRoles []string) (res CreateMachineResult, err error) {
 	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
@@ -52,7 +54,9 @@ func (a *API) CreateMachine(token string, entityId string, machineRoles roles.Ro
 type MachineSessionResult struct {
 	MachineId string
 	SessionId string
+	Subject   string
 	Secret    []byte
+	Expire    string
 }
 
 func (a *API) InitMachineSession(token string, entityId string, allowedIps []string) (res MachineSessionResult, err error) {
@@ -72,7 +76,7 @@ func (a *API) InitMachineSession(token string, entityId string, allowedIps []str
 		err = crudutils.InvalidValue(entityId)
 		return
 	}
-	sess, err := a.CreateSession(sessions.ScopeLogin, u.Id, allowedIps)
+	sess, err := a.CreateSession(sessions.ScopeMachine, e.Id, allowedIps)
 	if err != nil {
 		return
 	}
@@ -84,7 +88,9 @@ func (a *API) InitMachineSession(token string, entityId string, allowedIps []str
 	res = MachineSessionResult{
 		MachineId: sess.EntityId,
 		SessionId: sess.Id,
+		Subject:   sess.GetJwtSubject(),
 		Secret:    k.Value,
+		Expire:    sess.Expire.Format(time.RFC3339),
 	}
 	return
 }

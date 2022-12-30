@@ -4,7 +4,6 @@ import (
 	context "context"
 
 	"github.com/sandrolain/identity/src/entities"
-	"github.com/sandrolain/identity/src/roles"
 )
 
 func (s admingrpcServer) Login(ctx context.Context, req *LoginRequest) (res *LoginResponse, err error) {
@@ -29,7 +28,7 @@ func (s admingrpcServer) LoginConfirm(ctx context.Context, req *LoginConfirmRequ
 }
 
 func (s admingrpcServer) CreateMachine(ctx context.Context, req *CreateMachineRequest) (res *CreateMachineResponse, err error) {
-	r, err := s.Api.CreateMachine(req.SessionToken, req.Email, roles.Roles{})
+	r, err := s.Api.CreateMachine(req.SessionToken, req.Email, req.Roles)
 	if err == nil {
 		res = &CreateMachineResponse{
 			MachineId: r.MachineId,
@@ -44,6 +43,7 @@ func (s admingrpcServer) InitMachineSession(ctx context.Context, req *InitMachin
 		res = &InitMachineSessionResponse{
 			MachineId: r.MachineId,
 			SessionId: r.SessionId,
+			Subject:   r.Subject,
 			Secret:    r.Secret,
 		}
 	}

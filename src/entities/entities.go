@@ -9,7 +9,6 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
-	"github.com/sandrolain/go-utilities/pkg/jwtutils"
 	"github.com/sandrolain/go-utilities/pkg/pwdutils"
 	"github.com/sandrolain/identity/src/config"
 	"github.com/sandrolain/identity/src/roles"
@@ -172,23 +171,6 @@ func (u *Entity) SetTotpConfigured(configured bool) {
 
 func (u *Entity) IsTotpToConfigure() bool {
 	return !u.TotpConfigured
-}
-
-func (u *Entity) CreateTotpJWT(dur time.Duration, issuer string, secret []byte) (string, error) {
-	return jwtutils.CreateJWT(jwtutils.JWTParams{
-		ExpiresAt: time.Now().Add(dur),
-		Issuer:    issuer,
-		Secret:    secret,
-		Scope:     "otp",
-		Subject:   u.Id,
-	})
-}
-
-func ParseTotpJWT(jwtString string, secret []byte) (string, error) {
-	return jwtutils.ParseJWT(jwtString, jwtutils.JWTParams{
-		Secret: secret,
-		Scope:  "otp",
-	})
 }
 
 func generateRecoveryTokens(cfg config.RecoveryTokensConfig) ([]string, error) {
