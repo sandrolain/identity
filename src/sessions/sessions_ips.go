@@ -1,6 +1,8 @@
 package sessions
 
 import (
+	"strings"
+
 	"github.com/sandrolain/go-utilities/pkg/netutils"
 )
 
@@ -10,12 +12,18 @@ func (s *Session) GetAllowedIPs() SessionIPs {
 
 func (s *Session) HasAllowedIP(ip SessionIP) (bool, error) {
 	for _, value := range s.AllowedIPs {
-		ok, err := netutils.NetworkContainsIP(string(value), string(ip))
-		if err != nil {
-			return false, err
-		}
-		if ok {
-			return true, nil
+		if strings.Contains(value, "/") {
+			ok, err := netutils.NetworkContainsIP(value, ip)
+			if err != nil {
+				return false, err
+			}
+			if ok {
+				return true, nil
+			}
+		} else {
+			if ip == value {
+				return true, nil
+			}
 		}
 	}
 	return false, nil

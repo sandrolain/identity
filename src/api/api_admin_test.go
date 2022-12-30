@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
 	"github.com/sandrolain/go-utilities/pkg/jwtutils"
 	"github.com/sandrolain/go-utilities/pkg/pwdutils"
@@ -71,7 +72,7 @@ func TestAdminMachineManagement(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res4, err := a.InitMachineSession(res2.SessionToken, res3.MachineId, []string{"192.168.1.1/10"})
+	res4, err := a.InitMachineSession(res2.SessionToken, res3.MachineId, []string{"192.168.1.0/25", "127.0.0.1"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,12 +91,22 @@ func TestAdminMachineManagement(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res5, err := a.AuthenticateMachine(jwt, res4.MachineId, "192.168.1.8")
+	res5, err := a.AuthenticateMachine(jwt, res4.MachineId, "192.168.1.127")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if res5.MachineId != res3.MachineId {
 		t.Fatalf("machine id not match %v != %v", res5.MachineId, res3.MachineId)
+	}
+
+	res5, err = a.AuthenticateMachine(jwt, res4.MachineId, "127.0.0.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res5, err = a.AuthenticateMachine(jwt, res4.MachineId, "192.168.1.128")
+	if err == nil || !crudutils.IsNotAuthorized(err) {
+		t.Fatalf("expected ip not authorized, instead: %v", err)
 	}
 }

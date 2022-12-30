@@ -5,8 +5,9 @@ Identity Service as GoLang Exercise
 ## ToDo
 
 - [x] Env Config: Password Strength validation
-- [ ] Machine APIs: IP validation
+- [x] Machine APIs: IP validation
 - [ ] Machine APIs: Issuer validation
+- [ ] Machine APIs: JWT creation date validation (less than ...)
 - WebAuthn
   - [ ] WebAuthn: Association
   - [ ] WebAuthn: Login
