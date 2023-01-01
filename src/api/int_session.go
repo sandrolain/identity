@@ -75,10 +75,14 @@ func (a *API) ExtendSession(s sessions.Session) (res sessions.Session, err error
 	return
 }
 
-func (a *API) DeleteSession(sessionId string) error {
-	return a.VolatileStorage.DeleteSession(sessionId)
+func (a *API) DeleteSession(sessionId string) (err error) {
+	err = a.VolatileStorage.DeleteSession(sessionId)
+	if err == nil {
+		err = a.PersistentStorage.DeleteSession(sessionId)
+	}
+	return
 }
 
-func (a *API) GetEntitySessions(sessionId string) ([]sessions.Session, error) {
-	return a.VolatileStorage.GetEntitySessions(sessionId)
+func (a *API) GetEntitySessions(entityId string) ([]sessions.Session, error) {
+	return a.VolatileStorage.GetEntitySessions(entityId)
 }

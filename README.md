@@ -26,6 +26,12 @@ Identity Service as GoLang Exercise
   - [ ] Reset machine sessions
   - [ ] List machine sessions
   - [ ] Logout
+- Convert internal errors into public messages according to the type of error
+
+## To Evaluate
+- Use og msgpack instead of gob
+- 
+
 
 ## Premises
 

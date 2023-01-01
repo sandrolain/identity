@@ -94,3 +94,45 @@ func (a *API) InitMachineSession(token string, entityId string, allowedIps []str
 	}
 	return
 }
+
+type InvalidateMachineSessionResult struct {
+	MachineId string
+	SessionId string
+}
+
+func (a *API) InvalidateMachineSession(token string, entityId string, sessionId string) (res InvalidateMachineSessionResult, err error) {
+	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
+	if err != nil {
+		return
+	}
+	if !u.IsAdmin() || !u.Roles.Has(roles.RoleMachinesManager) {
+		err = crudutils.NotAuthorized("")
+		return
+	}
+	e, err := a.GetEntityById(entityId)
+	if err != nil {
+		return
+	}
+	if !e.IsMachine() {
+		err = crudutils.InvalidValue(entityId)
+		return
+	}
+	sess, err := a.GetSession(sessions.ScopeMachine, sessionId)
+	if err != nil {
+		return
+	}
+	if sess.EntityId != entityId {
+		err = crudutils.InvalidValue(entityId)
+		return
+	}
+	err = a.DeleteSession(sessionId)
+	if err != nil {
+		return
+	}
+
+	res = InvalidateMachineSessionResult{
+		MachineId: sess.EntityId,
+		SessionId: sess.Id,
+	}
+	return
+}

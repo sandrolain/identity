@@ -64,7 +64,7 @@ func (a *API) Login(entityType entities.EntityType, entityId string, password st
 }
 
 func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err error) {
-	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeTotp, token)
+	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeTotp, token)
 	if err != nil {
 		return
 	}
@@ -90,6 +90,11 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 		return
 	}
 
+	err = a.DeleteSession(s.Id)
+	if err != nil {
+		logutils.Error("cannot delete totp session", err)
+	}
+
 	res.SessionToken = token
 
 	return
@@ -110,6 +115,22 @@ func (a *API) GetUserDetails(token string) (res EntityDetailsResult, err error) 
 	_, err = a.ExtendSession(s)
 	if err != nil {
 		logutils.Error("cannot extend Entity session", err)
+	}
+	return
+}
+
+func (a *API) Logout(token string) (res EntityDetailsResult, err error) {
+	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
+	if err != nil {
+		return
+	}
+	if u.Type != entities.TypeAdmin && u.Type != entities.TypeUser {
+		err = crudutils.NotAuthorized("user type")
+		return
+	}
+	err = a.VolatileStorage.DeleteSession(s.Id)
+	if err != nil {
+		logutils.Error("cannot logout", err)
 	}
 	return
 }
