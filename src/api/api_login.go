@@ -25,6 +25,11 @@ type EntityDetailsResult struct {
 	TotpUri        string
 }
 
+type LogoutResult struct {
+	EntityId  string
+	SessionId string
+}
+
 func (a *API) Login(entityType entities.EntityType, entityId string, password string) (res LoginResult, err error) {
 	if !entities.ValidEntityId(entityId) {
 		err = crudutils.InvalidValue(entityId)
@@ -119,7 +124,7 @@ func (a *API) GetUserDetails(token string) (res EntityDetailsResult, err error) 
 	return
 }
 
-func (a *API) Logout(token string) (res EntityDetailsResult, err error) {
+func (a *API) Logout(token string) (res LogoutResult, err error) {
 	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
@@ -132,5 +137,7 @@ func (a *API) Logout(token string) (res EntityDetailsResult, err error) {
 	if err != nil {
 		logutils.Error("cannot logout", err)
 	}
+	res.EntityId = u.Id
+	res.SessionId = s.Id
 	return
 }

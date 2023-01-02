@@ -25,6 +25,7 @@ type ClientServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error)
 	GetUserDetails(ctx context.Context, in *GetUserDetailsRequest, opts ...grpc.CallOption) (*GetUserDetailsResponse, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error)
 }
 
@@ -63,6 +64,15 @@ func (c *clientServiceClient) GetUserDetails(ctx context.Context, in *GetUserDet
 	return out, nil
 }
 
+func (c *clientServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
+	out := new(LogoutResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/Logout", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *clientServiceClient) AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error) {
 	out := new(AuthenticateMachineResponse)
 	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/AuthenticateMachine", in, out, opts...)
@@ -79,6 +89,7 @@ type ClientServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error)
 	GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error)
+	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error)
 	mustEmbedUnimplementedClientServiceServer()
 }
@@ -95,6 +106,9 @@ func (UnimplementedClientServiceServer) LoginConfirm(context.Context, *LoginConf
 }
 func (UnimplementedClientServiceServer) GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserDetails not implemented")
+}
+func (UnimplementedClientServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedClientServiceServer) AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateMachine not implemented")
@@ -166,6 +180,24 @@ func _ClientService_GetUserDetails_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/Logout",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).Logout(ctx, req.(*LogoutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClientService_AuthenticateMachine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AuthenticateMachineRequest)
 	if err := dec(in); err != nil {
@@ -202,6 +234,10 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserDetails",
 			Handler:    _ClientService_GetUserDetails_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _ClientService_Logout_Handler,
 		},
 		{
 			MethodName: "AuthenticateMachine",

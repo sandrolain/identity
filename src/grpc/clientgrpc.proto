@@ -47,10 +47,20 @@ message AuthenticateMachineResponse {
   repeated string roles = 3;
 }
 
+message LogoutRequest {
+  string sessionToken = 1;
+}
+
+message LogoutResponse {
+  string id = 1;
+  string sessionId = 2;
+}
+
 
 service ClientService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
   rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
   rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
 }

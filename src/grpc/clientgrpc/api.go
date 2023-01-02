@@ -41,6 +41,17 @@ func (s clientgrpcServer) GetUserDetails(ctx context.Context, req *GetUserDetail
 	return
 }
 
+func (s clientgrpcServer) Logout(ctx context.Context, req *LogoutRequest) (res *LogoutResponse, err error) {
+	r, err := s.Api.Logout(req.SessionToken)
+	if err == nil {
+		res = &LogoutResponse{
+			Id:        r.EntityId,
+			SessionId: r.SessionId,
+		}
+	}
+	return
+}
+
 func (s clientgrpcServer) AuthenticateMachine(ctx context.Context, req *AuthenticateMachineRequest) (res *AuthenticateMachineResponse, err error) {
 	r, err := s.Api.AuthenticateMachine(req.MachineToken, req.Email, req.Ip)
 	if err == nil {

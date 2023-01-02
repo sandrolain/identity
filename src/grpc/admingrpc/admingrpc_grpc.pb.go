@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AdminServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	CreateMachine(ctx context.Context, in *CreateMachineRequest, opts ...grpc.CallOption) (*CreateMachineResponse, error)
 	InitMachineSession(ctx context.Context, in *InitMachineSessionRequest, opts ...grpc.CallOption) (*InitMachineSessionResponse, error)
 }
@@ -54,6 +55,15 @@ func (c *adminServiceClient) LoginConfirm(ctx context.Context, in *LoginConfirmR
 	return out, nil
 }
 
+func (c *adminServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
+	out := new(LogoutResponse)
+	err := c.cc.Invoke(ctx, "/admingrpc.AdminService/Logout", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *adminServiceClient) CreateMachine(ctx context.Context, in *CreateMachineRequest, opts ...grpc.CallOption) (*CreateMachineResponse, error) {
 	out := new(CreateMachineResponse)
 	err := c.cc.Invoke(ctx, "/admingrpc.AdminService/CreateMachine", in, out, opts...)
@@ -78,6 +88,7 @@ func (c *adminServiceClient) InitMachineSession(ctx context.Context, in *InitMac
 type AdminServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error)
+	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	CreateMachine(context.Context, *CreateMachineRequest) (*CreateMachineResponse, error)
 	InitMachineSession(context.Context, *InitMachineSessionRequest) (*InitMachineSessionResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
@@ -92,6 +103,9 @@ func (UnimplementedAdminServiceServer) Login(context.Context, *LoginRequest) (*L
 }
 func (UnimplementedAdminServiceServer) LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginConfirm not implemented")
+}
+func (UnimplementedAdminServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedAdminServiceServer) CreateMachine(context.Context, *CreateMachineRequest) (*CreateMachineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMachine not implemented")
@@ -148,6 +162,24 @@ func _AdminService_LoginConfirm_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/admingrpc.AdminService/Logout",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).Logout(ctx, req.(*LogoutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AdminService_CreateMachine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateMachineRequest)
 	if err := dec(in); err != nil {
@@ -198,6 +230,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginConfirm",
 			Handler:    _AdminService_LoginConfirm_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _AdminService_Logout_Handler,
 		},
 		{
 			MethodName: "CreateMachine",

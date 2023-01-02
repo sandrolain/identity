@@ -27,6 +27,17 @@ func (s admingrpcServer) LoginConfirm(ctx context.Context, req *LoginConfirmRequ
 	return
 }
 
+func (s admingrpcServer) Logout(ctx context.Context, req *LogoutRequest) (res *LogoutResponse, err error) {
+	r, err := s.Api.Logout(req.SessionToken)
+	if err == nil {
+		res = &LogoutResponse{
+			Id:        r.EntityId,
+			SessionId: r.SessionId,
+		}
+	}
+	return
+}
+
 func (s admingrpcServer) CreateMachine(ctx context.Context, req *CreateMachineRequest) (res *CreateMachineResponse, err error) {
 	r, err := s.Api.CreateMachine(req.SessionToken, req.Email, req.Roles)
 	if err == nil {

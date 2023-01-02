@@ -46,9 +46,20 @@ message CreateMachineResponse {
   string machineId = 1;
 }
 
+message LogoutRequest {
+  string sessionToken = 1;
+}
+
+message LogoutResponse {
+  string id = 1;
+  string sessionId = 2;
+}
+
+
 service AdminService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
   rpc CreateMachine(CreateMachineRequest) returns (CreateMachineResponse);
   rpc InitMachineSession(InitMachineSessionRequest) returns (InitMachineSessionResponse);
 }

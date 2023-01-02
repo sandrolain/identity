@@ -3,6 +3,7 @@ package api
 import (
 	"testing"
 
+	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/go-utilities/pkg/cryptoutils"
 	"github.com/sandrolain/go-utilities/pkg/pwdutils"
 	"github.com/sandrolain/identity/src/config"
@@ -70,6 +71,21 @@ func TestUserLogin(t *testing.T) {
 
 		if res3.EntityId != u.Id {
 			t.Fatalf("entity details not match: %v != %v", res3.EntityId, u.Id)
+		}
+
+		res4, err := a.Logout(res2.SessionToken)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = storage.GetSession(res4.SessionId)
+		if _, ok := err.(*crudutils.NotFoundError); !ok {
+			t.Fatal("session should not be available")
+		}
+
+		_, err = a.GetUserDetails(res2.SessionToken)
+		if _, ok := err.(*crudutils.NotFoundError); !ok {
+			t.Fatal("API call with expired session should not be possible")
 		}
 	}
 
