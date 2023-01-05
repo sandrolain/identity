@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/sandrolain/identity/src/authnweb"
 	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/sessions"
 )
@@ -15,6 +17,9 @@ type PersistentStorage interface {
 	DeleteSession(sessionId string) error
 	GetEntitySessions(entityId string) ([]sessions.Session, error)
 	DeleteEntitySessions(entityId string) error
+
+	SaveWebauthnCredential(credential authnweb.EntityCredential) error
+	GetWebauthnCredentials(entityId string) ([]authnweb.EntityCredential, error)
 }
 
 type VolatileStorage interface {
@@ -23,4 +28,7 @@ type VolatileStorage interface {
 	DeleteSession(sessionId string) error
 	GetEntitySessions(entityId string) ([]sessions.Session, error)
 	DeleteEntitySessions(entityId string) error
+	SaveWebauthnSessionData(sessionId string, data webauthn.SessionData) error
+	GetWebauthnSessionData(sessionId string) (webauthn.SessionData, error)
+	DeleteWebauthnSessionData(sessionId string) error
 }

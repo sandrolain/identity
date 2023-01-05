@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
 	"github.com/sandrolain/go-utilities/pkg/redisutils"
 	"github.com/sandrolain/identity/src/sessions"
@@ -44,6 +45,23 @@ func (s *RedisStorage) DeleteSession(sessionId string) error {
 func (s *RedisStorage) DeleteEntitySessions(entityId string) error {
 	// TODO:
 	return nil
+}
+func (s *RedisStorage) SaveWebauthnSessionData(sessionId string, data webauthn.SessionData) error {
+	return s.client.Set(redisutils.Key{"webauthn", sessionId}, data, time.Minute*15) // TODO: duration from config
+}
+func (s *RedisStorage) GetWebauthnSessionData(sessionId string) (res webauthn.SessionData, err error) {
+	found, err := s.client.Get(redisutils.Key{"webauthn", sessionId}, &res)
+	if err != nil {
+		return
+	}
+	if !found {
+		err = crudutils.NotFound(sessionId)
+		return
+	}
+	return
+}
+func (s *RedisStorage) DeleteWebauthnSessionData(sessionId string) error {
+	return s.client.Delete(redisutils.Key{"webauthn", sessionId})
 }
 
 func CreateRedisStorage(host string, password string, tls *tls.Config, timeout time.Duration) (storage.VolatileStorage, error) {

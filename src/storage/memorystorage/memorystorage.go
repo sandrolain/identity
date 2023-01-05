@@ -1,15 +1,19 @@
 package memorystorage
 
 import (
+	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/sandrolain/go-utilities/pkg/crudutils"
+	"github.com/sandrolain/identity/src/authnweb"
 	"github.com/sandrolain/identity/src/entities"
 	"github.com/sandrolain/identity/src/sessions"
 )
 
 type MemoryStorage struct {
-	entities         map[string]entities.Entity
-	sessions         map[string]sessions.Session
-	entitiesSessions map[string]map[string]bool
+	entities            map[string]entities.Entity
+	sessions            map[string]sessions.Session
+	entitiesSessions    map[string]map[string]bool
+	webauthnSessions    map[string]webauthn.SessionData
+	webauthnCredentials map[string]authnweb.EntityCredential
 }
 
 func (s *MemoryStorage) GetEntity(entityId string) (u entities.Entity, err error) {
@@ -70,10 +74,41 @@ func (s *MemoryStorage) DeleteEntitySessions(entityId string) error {
 	return nil
 }
 
+func (s *MemoryStorage) GetWebauthnSessionData(sessionId string) (res webauthn.SessionData, err error) {
+	res, ok := s.webauthnSessions[sessionId]
+	if !ok {
+		err = crudutils.NotFound(sessionId)
+	}
+	return
+}
+func (s *MemoryStorage) SaveWebauthnSessionData(sessionId string, data webauthn.SessionData) error {
+	s.webauthnSessions[sessionId] = data
+	return nil
+}
+func (s *MemoryStorage) DeleteWebauthnSessionData(sessionId string) error {
+	delete(s.webauthnSessions, sessionId)
+	return nil
+}
+
+func (s *MemoryStorage) SaveWebauthnCredential(data authnweb.EntityCredential) error {
+	s.webauthnCredentials[string(data.ID)] = data
+	return nil
+}
+func (s *MemoryStorage) GetWebauthnCredentials(entityId string) (res []authnweb.EntityCredential, err error) {
+	for _, sess := range s.webauthnCredentials {
+		if sess.EntityId == entityId {
+			res = append(res, sess)
+		}
+	}
+	return
+}
+
 func CreateMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
-		entities:         make(map[string]entities.Entity),
-		sessions:         make(map[string]sessions.Session),
-		entitiesSessions: make(map[string]map[string]bool),
+		entities:            make(map[string]entities.Entity),
+		sessions:            make(map[string]sessions.Session),
+		entitiesSessions:    make(map[string]map[string]bool),
+		webauthnSessions:    make(map[string]webauthn.SessionData),
+		webauthnCredentials: make(map[string]authnweb.EntityCredential),
 	}
 }

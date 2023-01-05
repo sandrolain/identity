@@ -87,6 +87,11 @@ type LoginConfig struct {
 	LockoutMinutes int
 }
 
+type WebAuthnConfig struct {
+	DisplayName string
+	Origin      string
+}
+
 type Config struct {
 	MongoDb    MongoDbConfig
 	Redis      RedisConfig
@@ -97,6 +102,7 @@ type Config struct {
 	Session    SessionConfig
 	Login      LoginConfig
 	Keys       SecureKeyConfig
+	WebAuthn   WebAuthnConfig
 }
 
 func GetDefaultConfiguration() Config {
