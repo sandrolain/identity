@@ -22,14 +22,20 @@ func (a *API) CreateSessionAndJWT(scope sessions.SessionScope, username string) 
 }
 
 func (a *API) GetSessionScopeDuration(scope sessions.SessionScope) (dur time.Duration) {
+	var minutes int
 	switch scope {
 	case sessions.ScopeTotp:
-		dur = time.Minute * time.Duration(a.Config.Session.TotpRequestMinutes)
+		minutes = a.Config.Session.TotpRequestMinutes
 	case sessions.ScopeLogin:
-		dur = time.Minute * time.Duration(a.Config.Session.LoginSessionMinutes)
+		minutes = a.Config.Session.LoginSessionMinutes
 	case sessions.ScopeMachine:
-		dur = time.Minute * time.Duration(a.Config.Session.MachineKeyMinutes)
+		minutes = a.Config.Session.MachineKeyMinutes
+	case sessions.ScopePassword:
+		minutes = a.Config.Session.ChangePasswordMinutes
+	case sessions.ScopeWebauthn:
+		minutes = a.Config.Session.WebauthLoginMinutes
 	}
+	dur = time.Minute * time.Duration(minutes)
 	return
 }
 

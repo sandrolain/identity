@@ -77,9 +77,11 @@ type SecureKeyConfig struct {
 }
 
 type SessionConfig struct {
-	TotpRequestMinutes  int
-	LoginSessionMinutes int
-	MachineKeyMinutes   int
+	TotpRequestMinutes    int
+	LoginSessionMinutes   int
+	MachineKeyMinutes     int
+	ChangePasswordMinutes int
+	WebauthLoginMinutes   int
 }
 
 type LoginConfig struct {

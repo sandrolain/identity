@@ -56,6 +56,41 @@ message LogoutResponse {
   string sessionId = 2;
 }
 
+message BeginWebauthnRegisterRequest {
+  string sessionToken = 1;
+}
+
+message BeginWebauthnRegisterResponse {
+  string credentialCreation = 1;
+}
+
+message FinishWebauthnRegisterRequest {
+  string sessionToken = 1;
+}
+
+message FinishWebauthnRegisterResponse {
+  string credential = 1;
+}
+
+message BeginWebauthnLoginRequest {
+  string sessionToken = 1;
+}
+
+message BeginWebauthnLoginResponse {
+  string webauthToken = 1;
+  string credentialAssertion = 2;
+}
+
+message FinishWebauthnLoginRequest {
+  string webauthToken = 1;
+  string credential = 2;
+}
+
+message FinishWebauthnLoginResponse {
+  string sessionToken = 1;
+}
+
+
 
 service ClientService {
   rpc Login(LoginRequest) returns (LoginResponse);
@@ -63,4 +98,8 @@ service ClientService {
   rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
   rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
+  rpc BeginWebauthnRegister(BeginWebauthnRegisterRequest) returns (BeginWebauthnRegisterResponse);
+  rpc FinishWebauthnRegister(FinishWebauthnRegisterRequest) returns (FinishWebauthnRegisterResponse);
+  rpc BeginWebauthnLogin(BeginWebauthnLoginRequest) returns (BeginWebauthnLoginResponse);
+  rpc FinishWebauthnLogin(FinishWebauthnLoginRequest) returns (FinishWebauthnLoginResponse);
 }

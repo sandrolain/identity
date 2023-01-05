@@ -16,6 +16,7 @@ type WebauthnRegisterFinishnResult struct {
 }
 
 type WebauthnLoginBeginResult struct {
+	WebauthnToken       string
 	CredentialAssertion string
 }
 
@@ -76,13 +77,18 @@ func (a *API) WebauthnRegisterFinish(token string, request []byte) (res Webauthn
 	return
 }
 
-func (a *API) WebauthnLoginBegin(token string) (res WebauthnLoginBeginResult, err error) {
-	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeWebauthn, token)
+func (a *API) WebauthnLoginBegin(entityId string) (res WebauthnLoginBeginResult, err error) {
+	u, err := a.GetEntityById(entityId)
 	if err != nil {
 		return
 	}
 
 	cred, data, err := authnweb.LoginBegin(u, a.Config.WebAuthn)
+	if err != nil {
+		return
+	}
+
+	token, s, err := a.CreateSessionAndJWT(sessions.ScopeWebauthn, u.Id)
 	if err != nil {
 		return
 	}
@@ -97,6 +103,7 @@ func (a *API) WebauthnLoginBegin(token string) (res WebauthnLoginBeginResult, er
 		return
 	}
 
+	res.WebauthnToken = token
 	res.CredentialAssertion = string(jsonCred)
 
 	return
