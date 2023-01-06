@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package clientgrpc;
+
+option go_package = "./clientgrpc";
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string totpToken = 1;
+  string totpUri = 2;
+}
+
+message LoginConfirmRequest {
+  string totpToken = 1;
+  string totpCode = 2;
+}
+
+message LoginConfirmResponse {
+  string sessionToken = 1;
+}
+
+message GetUserDetailsRequest {
+  string sessionToken = 1;
+}
+
+message GetUserDetailsResponse {
+  string id = 1;
+  int32 type = 2;
+  repeated string roles = 3;
+	bool totpConfigured = 4;
+  string totpUri = 5;
+}
+
+message AuthenticateMachineRequest {
+  string machineToken = 1;
+  string email = 2;
+  string ip = 3;
+}
+
+message AuthenticateMachineResponse {
+  string id = 1;
+  int32 type = 2;
+  repeated string roles = 3;
+}
+
+message LogoutRequest {
+  string sessionToken = 1;
+}
+
+message LogoutResponse {
+  string id = 1;
+  string sessionId = 2;
+}
+
+message BeginWebauthnRegisterRequest {
+  string sessionToken = 1;
+}
+
+message BeginWebauthnRegisterResponse {
+  string credentialCreation = 1;
+}
+
+message FinishWebauthnRegisterRequest {
+  string sessionToken = 1;
+}
+
+message FinishWebauthnRegisterResponse {
+  string credential = 1;
+}
+
+message BeginWebauthnLoginRequest {
+  string sessionToken = 1;
+}
+
+message BeginWebauthnLoginResponse {
+  string webauthToken = 1;
+  string credentialAssertion = 2;
+}
+
+message FinishWebauthnLoginRequest {
+  string webauthToken = 1;
+  string credential = 2;
+}
+
+message FinishWebauthnLoginResponse {
+  string sessionToken = 1;
+}
+
+
+
+service ClientService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
+  rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
+  rpc BeginWebauthnRegister(BeginWebauthnRegisterRequest) returns (BeginWebauthnRegisterResponse);
+  rpc FinishWebauthnRegister(FinishWebauthnRegisterRequest) returns (FinishWebauthnRegisterResponse);
+  rpc BeginWebauthnLogin(BeginWebauthnLoginRequest) returns (BeginWebauthnLoginResponse);
+  rpc FinishWebauthnLogin(FinishWebauthnLoginRequest) returns (FinishWebauthnLoginResponse);
+}

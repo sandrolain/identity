@@ -15,7 +15,7 @@ import (
 const (
 	EntitiesCollection      = "entities"
 	SessionsCollection      = "sessions"
-	WebauthnCredsCollection = ""
+	WebauthnCredsCollection = "waCredentials"
 )
 
 type MongoDBStorage struct {
