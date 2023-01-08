@@ -30,3 +30,4 @@ localtest/data/
 localtest/cert/*.pem
 localtest/cert/*.srl
 node_modules/
+src-svc/waweb/assets/*.js

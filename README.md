@@ -23,6 +23,7 @@ Identity Service as GoLang Exercise
   - [ ] List Entities
   - [ ] Create Admin
   - [ ] Edit Admin
+  - [ ] Reset user totp
   - [ ] Reset machine sessions
   - [ ] List machine sessions
   - [ ] Logout

@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sandrolain/go-utilities/pkg/httputils"
 	"github.com/sandrolain/identity/src-svc/waweb/clientgrpc"
+	"github.com/sandrolain/identity/src-svc/waweb/handlers"
 )
 
 func main() {
@@ -20,19 +23,48 @@ func main() {
 	}
 	defer conn.Close()
 
-	res, err := client.Login(context.Background(), &clientgrpc.LoginRequest{
-		Email:    "sandrolain@outlook.com",
-		Password: "test123456",
-	})
-	fmt.Printf("res: %v\n", res)
-
 	app := fiber.New()
 
 	app.Static("/", "./assets")
+
+	handlers.InitHandlers(app, client)
+
+	var totpUri string
+
+	app.Get("/generateSessionToken", func(c *fiber.Ctx) error {
+		res, err := client.Login(context.Background(), &clientgrpc.LoginRequest{
+			Email:    "sandrolain@outlook.com",
+			Password: "test123456",
+		})
+		if err != nil {
+			return err
+		}
+
+		if res.TotpUri != "" {
+			totpUri = res.TotpUri
+		}
+
+		url := fmt.Sprintf("https://www.sandrolain.com/.netlify/functions/totpCode?uri=%v", url.QueryEscape(totpUri))
+		totp, err := httputils.Fetch(url).BodyString()
+		if err != nil {
+			return err
+		}
+
+		res2, err := client.LoginConfirm(context.Background(), &clientgrpc.LoginConfirmRequest{
+			TotpToken: res.TotpToken,
+			TotpCode:  totp,
+		})
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(res2)
+	})
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.SendString("Hello")
 	})
 
-	app.Listen(":3000")
+	err = app.Listen(":3000")
+	fmt.Print(err)
 }
