@@ -119,6 +119,12 @@ func (a *API) GetUserDetails(token string) (res EntityDetailsResult, err error) 
 	if err != nil {
 		return
 	}
+
+	if !u.Validated {
+		err = crudutils.NotAuthorized(u.Id)
+		return
+	}
+
 	res.EntityId = u.Id
 	res.Type = u.Type
 	res.Roles = u.Roles

@@ -47,7 +47,9 @@ func (a *API) AuthenticateWithSessionJWT(scope sessions.SessionScope, token stri
 		return
 	}
 
-	u, err = a.GetEntityById(s.EntityId)
+	if u, err = a.GetEntityById(s.EntityId); err != nil && u.Suspended {
+		err = crudutils.NotAuthorized(u.Id)
+	}
 
 	return
 }

@@ -63,7 +63,7 @@ func (a *API) GetSession(scope sessions.SessionScope, sessionId string) (s sessi
 		if err != nil {
 			nbErr := a.VolatileStorage.SaveSession(s)
 			if nbErr != nil {
-				logutils.Error(nbErr, "cannot save session to volatile storage", s.Id)
+				logutils.Error(nbErr, "cannot save session to volatile storage: %v", s.Id)
 			}
 		}
 	}

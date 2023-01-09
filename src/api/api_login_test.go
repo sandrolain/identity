@@ -64,7 +64,20 @@ func TestUserLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		res3, err := a.GetUserDetails(res2.SessionToken)
+		if res2.SessionToken != "" {
+			t.Fatal("Session token should be empty for not validate users")
+		}
+
+		if res2.ValidationToken == "" {
+			t.Fatal("Validation token should NOT be empty for not validate users")
+		}
+
+		res2a, err := a.CompleteEntityValidation(res2.ValidationToken)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res3, err := a.GetUserDetails(res2a.SessionToken)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -73,7 +86,7 @@ func TestUserLogin(t *testing.T) {
 			t.Fatalf("entity details not match: %v != %v", res3.EntityId, u.Id)
 		}
 
-		res4, err := a.Logout(res2.SessionToken)
+		res4, err := a.Logout(res2a.SessionToken)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -83,7 +96,7 @@ func TestUserLogin(t *testing.T) {
 			t.Fatal("session should not be available")
 		}
 
-		_, err = a.GetUserDetails(res2.SessionToken)
+		_, err = a.GetUserDetails(res2a.SessionToken)
 		if _, ok := err.(*crudutils.NotFoundError); !ok {
 			t.Fatal("API call with expired session should not be possible")
 		}
@@ -149,7 +162,20 @@ func TestAdminLogin(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		res3, err := a.GetUserDetails(res2.SessionToken)
+		if res2.SessionToken != "" {
+			t.Fatal("Session token should be empty for not validate users")
+		}
+
+		if res2.ValidationToken == "" {
+			t.Fatal("Validation token should NOT be empty for not validate users")
+		}
+
+		res2a, err := a.CompleteEntityValidation(res2.ValidationToken)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		res3, err := a.GetUserDetails(res2a.SessionToken)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -63,7 +63,9 @@ func NewEntity(typ EntityType, entityId string, password string, totpConfig conf
 		return
 	}
 
-	if typ != TypeMachine {
+	if typ == TypeMachine {
+		u.Validated = true
+	} else {
 		if err = u.ResetTotp(totpConfig); err != nil {
 			return
 		}

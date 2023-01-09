@@ -114,6 +114,10 @@ func (s *Session) CreateSessionJWT(issuer string, mk keys.MasterKey) (string, er
 }
 
 func (s *Session) VerifySessionJWT(jwtString string, mk keys.MasterKey) error {
+	if jwtString == "" {
+		return fmt.Errorf("session token is empty")
+	}
+
 	key, err := s.Key.Unsecure(mk)
 	if err != nil {
 		return err
