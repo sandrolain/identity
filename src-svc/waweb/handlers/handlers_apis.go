@@ -73,7 +73,7 @@ func BeginWebauthnLogin(c *fiber.Ctx) (err error) {
 		return
 	}
 	res, err := grpcCLient.BeginWebauthnLogin(c.UserContext(), &clientgrpc.BeginWebauthnLoginRequest{
-		SessionToken: sessionToken
+		SessionToken: sessionToken,
 	})
 	if err != nil {
 		return err
