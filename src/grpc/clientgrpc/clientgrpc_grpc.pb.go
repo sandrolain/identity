@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ClientServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error)
+	InitValidation(ctx context.Context, in *InitValidationRequest, opts ...grpc.CallOption) (*InitValidationResponse, error)
+	CompleteValidation(ctx context.Context, in *CompleteValidationRequest, opts ...grpc.CallOption) (*CompleteValidationResponse, error)
 	GetUserDetails(ctx context.Context, in *GetUserDetailsRequest, opts ...grpc.CallOption) (*GetUserDetailsResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error)
@@ -53,6 +55,24 @@ func (c *clientServiceClient) Login(ctx context.Context, in *LoginRequest, opts 
 func (c *clientServiceClient) LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error) {
 	out := new(LoginConfirmResponse)
 	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/LoginConfirm", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientServiceClient) InitValidation(ctx context.Context, in *InitValidationRequest, opts ...grpc.CallOption) (*InitValidationResponse, error) {
+	out := new(InitValidationResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/InitValidation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientServiceClient) CompleteValidation(ctx context.Context, in *CompleteValidationRequest, opts ...grpc.CallOption) (*CompleteValidationResponse, error) {
+	out := new(CompleteValidationResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/CompleteValidation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +148,8 @@ func (c *clientServiceClient) FinishWebauthnLogin(ctx context.Context, in *Finis
 type ClientServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error)
+	InitValidation(context.Context, *InitValidationRequest) (*InitValidationResponse, error)
+	CompleteValidation(context.Context, *CompleteValidationRequest) (*CompleteValidationResponse, error)
 	GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error)
@@ -147,6 +169,12 @@ func (UnimplementedClientServiceServer) Login(context.Context, *LoginRequest) (*
 }
 func (UnimplementedClientServiceServer) LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginConfirm not implemented")
+}
+func (UnimplementedClientServiceServer) InitValidation(context.Context, *InitValidationRequest) (*InitValidationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InitValidation not implemented")
+}
+func (UnimplementedClientServiceServer) CompleteValidation(context.Context, *CompleteValidationRequest) (*CompleteValidationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CompleteValidation not implemented")
 }
 func (UnimplementedClientServiceServer) GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserDetails not implemented")
@@ -214,6 +242,42 @@ func _ClientService_LoginConfirm_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ClientServiceServer).LoginConfirm(ctx, req.(*LoginConfirmRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClientService_InitValidation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitValidationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).InitValidation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/InitValidation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).InitValidation(ctx, req.(*InitValidationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClientService_CompleteValidation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteValidationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).CompleteValidation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/CompleteValidation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).CompleteValidation(ctx, req.(*CompleteValidationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -358,6 +422,14 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginConfirm",
 			Handler:    _ClientService_LoginConfirm_Handler,
+		},
+		{
+			MethodName: "InitValidation",
+			Handler:    _ClientService_InitValidation_Handler,
+		},
+		{
+			MethodName: "CompleteValidation",
+			Handler:    _ClientService_CompleteValidation_Handler,
 		},
 		{
 			MethodName: "GetUserDetails",

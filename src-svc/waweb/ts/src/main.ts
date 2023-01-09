@@ -1,9 +1,11 @@
 import { $, getData, on, post } from "./lib.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+on(document, "DOMContentLoaded", () => {
   let loginResponse: {totpToken: string};
 
   const $login = $<HTMLFormElement>("#login")!;
+  const $loginConfirm = $<HTMLFormElement>("#login-confirm")!;
+
   on($login, "submit", async (e) => {
     e.preventDefault();
     const data = getData($login);
@@ -13,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     $loginConfirm.hidden = false;
   });
 
-  const $loginConfirm = $<HTMLFormElement>("#login-confirm")!;
   on($loginConfirm, "submit", async (e) => {
     e.preventDefault();
     const data = getData($loginConfirm);

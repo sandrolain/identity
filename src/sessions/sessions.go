@@ -14,11 +14,12 @@ import (
 type SessionScope string
 
 const (
-	ScopeTotp     SessionScope = "otp"
-	ScopeLogin    SessionScope = "sid"
-	ScopePassword SessionScope = "pwd"
-	ScopeWebauthn SessionScope = "wau"
-	ScopeMachine  SessionScope = "mac"
+	ScopeTotp       SessionScope = "otp"
+	ScopeValidation SessionScope = "vld"
+	ScopeLogin      SessionScope = "sid"
+	ScopePassword   SessionScope = "pwd"
+	ScopeWebauthn   SessionScope = "wau"
+	ScopeMachine    SessionScope = "mac"
 )
 
 type SessionExpiredError struct{}

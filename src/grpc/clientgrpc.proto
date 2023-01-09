@@ -21,6 +21,7 @@ message LoginConfirmRequest {
 
 message LoginConfirmResponse {
   string sessionToken = 1;
+  string validationToken = 2;
 }
 
 message GetUserDetailsRequest {
@@ -90,11 +91,29 @@ message FinishWebauthnLoginResponse {
   string sessionToken = 1;
 }
 
+message InitValidationRequest {
+  string sessionToken = 1;
+}
+
+message InitValidationResponse {
+  string validationToken = 1;
+}
+
+message CompleteValidationRequest {
+  string validationToken = 1;
+}
+
+message CompleteValidationResponse {
+  string sessionToken = 1;
+}
+
 
 
 service ClientService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
+  rpc InitValidation(InitValidationRequest) returns (InitValidationResponse);
+  rpc CompleteValidation(CompleteValidationRequest) returns (CompleteValidationResponse);
   rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
   rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);

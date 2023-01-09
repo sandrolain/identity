@@ -8,15 +8,20 @@ Identity Service as GoLang Exercise
 - [x] Machine APIs: IP validation
 - [ ] Machine APIs: Issuer validation
 - [ ] Machine APIs: JWT creation date validation (less than ...)
-- WebAuthn
-  - [ ] WebAuthn: Association
-  - [ ] WebAuthn: Login
 - [ ] gRPC: mTLS
 - [ ] Roles package
 - [ ] Admin APIs authorized with roles
 - User:
+  - Until validation can only request validation token after login
+  - [ ] Registration
+    - [ ] Email validation token
+    - [ ] Email validation completion
   - [ ] Password reset
-  - [ ] Logout
+    - [ ] Token generation
+    - [ ] Reset completion
+  - [x] Logout
+  - [ ] WebAuthn: Association
+  - [ ] WebAuthn: Login
 - Admin:
   - [ ] Edit user
   - [ ] Edit machine

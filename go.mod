@@ -7,6 +7,7 @@ replace github.com/sandrolain/go-utilities => ./go-utilities
 require (
 	github.com/go-webauthn/webauthn v0.6.0
 	github.com/gofiber/fiber/v2 v2.41.0
+	github.com/gofiber/template v1.7.3
 	github.com/pquerna/otp v1.4.0
 	github.com/sandrolain/go-utilities v0.0.0-00010101000000-000000000000
 	github.com/segmentio/ksuid v1.0.4
@@ -27,12 +28,11 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/golang/snappy v0.0.1 // indirect
+	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-tpm v0.3.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
@@ -58,5 +58,5 @@ require (
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20210510173355-fb37daa5cd7a // indirect
+	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa // indirect
 )

@@ -4,25 +4,31 @@
 
   </head>
   <body>
-    
-    <form id="login">
-      <label for="email">Email</label><br/>
-      <input type="email" name="email" id="email" />
-      <br/>
-      <label for="password">Password</label><br/>
-      <input type="password" name="password" id="password" />
-      <br/>
-      <button type="submit">Login</button>
-    </form>
-
-    <form id="login-confirm" hidden>
-      <label for="totpCode">OTP Code</label><br/>
-      <input type="totpCode" name="totpCode" id="totpCode" />
-      <br/>
-      <button type="submit">Confirm</button>
-    </form>
-
-    <script type="module" src="./login.js"></script>
+    <div id="login-sect">
+      <form id="login">
+        <label for="email">Email</label><br/>
+        <input type="email" name="email" id="email" />
+        <br/>
+        <label for="password">Password</label><br/>
+        <input type="password" name="password" id="password" />
+        <br/>
+        <button type="submit">Login</button>
+      </form>
+      <form id="login-confirm" hidden>
+        <label for="totpCode">OTP Code</label><br/>
+        <input type="totpCode" name="totpCode" id="totpCode" />
+        <br/>
+        <button type="submit">Confirm</button>
+      </form>
+    </div>
+    <div id="walogin-sect">
+      <form id="walogin">
+        <label for="email">Email</label><br/>
+        <input type="email" name="email" id="email" />
+        <br/>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+    <script type="module" src="./main.js"></script>
   </body>
-</body>
 </html>

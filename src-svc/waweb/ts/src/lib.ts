@@ -3,7 +3,7 @@ export function $<T extends Element>(selector: string) {
   return document.querySelector<T>(selector);
 }
 
-export function on(el: Element, name: string, fn: EventListenerOrEventListenerObject) {
+export function on(el: Element | Document, name: string, fn: EventListenerOrEventListenerObject) {
   el.addEventListener(name, fn);
 }
 

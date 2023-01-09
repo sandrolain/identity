@@ -29,6 +29,7 @@ type Entity struct {
 	Id             string      `json:"id" bson:"_id"`
 	Type           EntityType  `json:"type" bson:"type"`
 	PasswordHash   []byte      `json:"passwordHash" bson:"passwordHash"`
+	Validated      bool        `json:"validated" bson:"validated"`
 	Suspended      bool        `json:"suspended" bson:"suspended"`
 	TotpConfigured bool        `json:"totpConfigured" bson:"totpConfigured"`
 	TotpUri        string      `json:"totpUri" bson:"totpUri"`
@@ -69,6 +70,14 @@ func NewEntity(typ EntityType, entityId string, password string, totpConfig conf
 	}
 
 	return
+}
+
+func (u *Entity) Validate() {
+	u.Validated = true
+}
+
+func (u *Entity) Invalidate() {
+	u.Validated = false
 }
 
 func (u *Entity) Suspend() {

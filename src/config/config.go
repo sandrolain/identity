@@ -9,21 +9,24 @@ import (
 )
 
 const (
-	DEF_MONGOBD_DATABASE      = "identity"
-	DEF_MONGODB_TIMEOUT       = 5
-	DEF_REDIS_TIMEOUT         = 5
-	DEF_GRPC_ADMIN_PORT       = 1984
-	DEF_GRPC_CLIENT_PORT      = 1985
-	DEF_TOTP_RECOVERY_LENGTH  = 4
-	DEF_TOTP_RECOVERY_SIZE    = 8
-	DEF_TOTP_ISSUER           = "identity"
-	DEF_KEY_LENGTH            = 32
-	DEF_JWT_ISSUER            = "identity"
-	DEF_TOTP_REQUEST_MINUTES  = 10
-	DEF_LOGIN_SESSION_MINUTES = 30
-	DEF_MACHINE_KEY_MINUTES   = 525_600 // 1 year
-	DEF_LOGIN_MAX_FAILS       = 3
-	DEF_LOGIN_LOCKOUT_MINUTES = 30
+	DEF_MONGOBD_DATABASE        = "identity"
+	DEF_MONGODB_TIMEOUT         = 5
+	DEF_REDIS_TIMEOUT           = 5
+	DEF_GRPC_ADMIN_PORT         = 1984
+	DEF_GRPC_CLIENT_PORT        = 1985
+	DEF_TOTP_RECOVERY_LENGTH    = 4
+	DEF_TOTP_RECOVERY_SIZE      = 8
+	DEF_TOTP_ISSUER             = "identity"
+	DEF_KEY_LENGTH              = 32
+	DEF_JWT_ISSUER              = "identity"
+	DEF_TOTP_REQUEST_MINUTES    = 10
+	DEF_VALIDATION_MINUTES      = 1440 // 24 h
+	DEF_LOGIN_SESSION_MINUTES   = 30
+	DEF_MACHINE_KEY_MINUTES     = 525_600 // 1 y
+	DEF_CHANGE_PASSWORD_MINUTES = 1440    // 24 h
+	DEF_WEBAUTHN_LOGIN_MINUTES  = 10
+	DEF_LOGIN_MAX_FAILS         = 3
+	DEF_LOGIN_LOCKOUT_MINUTES   = 30
 )
 
 const (
@@ -78,6 +81,7 @@ type SecureKeyConfig struct {
 
 type SessionConfig struct {
 	TotpRequestMinutes    int
+	ValidationMinutes     int
 	LoginSessionMinutes   int
 	MachineKeyMinutes     int
 	ChangePasswordMinutes int
@@ -133,9 +137,12 @@ func GetDefaultConfiguration() Config {
 			Issuer: DEF_JWT_ISSUER,
 		},
 		Session: SessionConfig{
-			TotpRequestMinutes:  DEF_TOTP_REQUEST_MINUTES,
-			LoginSessionMinutes: DEF_LOGIN_SESSION_MINUTES,
-			MachineKeyMinutes:   DEF_MACHINE_KEY_MINUTES,
+			TotpRequestMinutes:    DEF_TOTP_REQUEST_MINUTES,
+			ValidationMinutes:     DEF_VALIDATION_MINUTES,
+			LoginSessionMinutes:   DEF_LOGIN_SESSION_MINUTES,
+			MachineKeyMinutes:     DEF_MACHINE_KEY_MINUTES,
+			ChangePasswordMinutes: DEF_CHANGE_PASSWORD_MINUTES,
+			WebauthLoginMinutes:   DEF_WEBAUTHN_LOGIN_MINUTES,
 		},
 		Login: LoginConfig{
 			MaxFails:       DEF_LOGIN_MAX_FAILS,

@@ -26,6 +26,8 @@ func (a *API) GetSessionScopeDuration(scope sessions.SessionScope) (dur time.Dur
 	switch scope {
 	case sessions.ScopeTotp:
 		minutes = a.Config.Session.TotpRequestMinutes
+	case sessions.ScopeValidation:
+		minutes = a.Config.Session.ValidationMinutes
 	case sessions.ScopeLogin:
 		minutes = a.Config.Session.LoginSessionMinutes
 	case sessions.ScopeMachine:
@@ -61,7 +63,7 @@ func (a *API) GetSession(scope sessions.SessionScope, sessionId string) (s sessi
 		if err != nil {
 			nbErr := a.VolatileStorage.SaveSession(s)
 			if nbErr != nil {
-				logutils.Error("cannot save session to volatile storage", nbErr)
+				logutils.Error(nbErr, "cannot save session to volatile storage", s.Id)
 			}
 		}
 	}

@@ -14,7 +14,8 @@ type LoginResult struct {
 }
 
 type LoginTotpResult struct {
-	SessionToken string
+	SessionToken    string
+	ValidationToken string
 }
 
 type EntityDetailsResult struct {
@@ -90,17 +91,25 @@ func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err erro
 		}
 	}
 
-	token, _, err = a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)
+	var sssToken string
+	var vldToken string
+
+	if u.Validated {
+		sssToken, _, err = a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)
+	} else {
+		vldToken, _, err = a.CreateSessionAndJWT(sessions.ScopeValidation, u.Id)
+	}
 	if err != nil {
 		return
 	}
 
 	err = a.DeleteSession(s.Id)
 	if err != nil {
-		logutils.Error("cannot delete totp session", err)
+		logutils.Error(err, "cannot delete totp session: %v", s.Id)
 	}
 
-	res.SessionToken = token
+	res.SessionToken = sssToken
+	res.ValidationToken = vldToken
 
 	return
 }
@@ -119,7 +128,7 @@ func (a *API) GetUserDetails(token string) (res EntityDetailsResult, err error) 
 	}
 	_, err = a.ExtendSession(s)
 	if err != nil {
-		logutils.Error("cannot extend Entity session", err)
+		logutils.Error(err, "cannot extend Entity session: %v", s.Id)
 	}
 	return
 }
@@ -135,7 +144,7 @@ func (a *API) Logout(token string) (res LogoutResult, err error) {
 	}
 	err = a.VolatileStorage.DeleteSession(s.Id)
 	if err != nil {
-		logutils.Error("cannot logout", err)
+		return
 	}
 	res.EntityId = u.Id
 	res.SessionId = s.Id

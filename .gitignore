@@ -17,6 +17,9 @@ vendor/
 # macOS
 .DS_Store
 
+# vscode
+.vscode
+
 # environment
 .env
 
