@@ -59,6 +59,20 @@ func LoginConfirm(c *fiber.Ctx) (err error) {
 	return c.JSON(res)
 }
 
+func BeginWebauthnRegister(c *fiber.Ctx) (err error) {
+	sessionToken, err := getBearerToken(c)
+	if err != nil {
+		return
+	}
+	res, err := grpcCLient.BeginWebauthnRegister(c.UserContext(), &clientgrpc.BeginWebauthnRegisterRequest{
+		SessionToken: sessionToken,
+	})
+	if err != nil {
+		return err
+	}
+	return c.JSON(res)
+}
+
 type BeginWebauthnLoginRequest struct {
 	Email string `json:"email" form:"email"`
 }
@@ -68,12 +82,8 @@ func BeginWebauthnLogin(c *fiber.Ctx) (err error) {
 	if err = c.BodyParser(&req); err != nil {
 		return
 	}
-	sessionToken, err := getBearerToken(c)
-	if err != nil {
-		return
-	}
 	res, err := grpcCLient.BeginWebauthnLogin(c.UserContext(), &clientgrpc.BeginWebauthnLoginRequest{
-		SessionToken: sessionToken,
+		Email: req.Email,
 	})
 	if err != nil {
 		return err

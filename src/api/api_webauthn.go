@@ -20,6 +20,10 @@ type WebauthnLoginBeginResult struct {
 	CredentialAssertion string
 }
 
+type WebauthnLoginFinishResult struct {
+	SessionToken string
+}
+
 func (a *API) WebauthnRegisterBegin(token string) (res WebauthnRegisterBeginResult, err error) {
 	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
@@ -46,7 +50,7 @@ func (a *API) WebauthnRegisterBegin(token string) (res WebauthnRegisterBeginResu
 	return
 }
 
-func (a *API) WebauthnRegisterFinish(token string, request []byte) (res WebauthnRegisterBeginResult, err error) {
+func (a *API) WebauthnRegisterFinish(token string, request []byte) (res WebauthnRegisterFinishnResult, err error) {
 	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
 	if err != nil {
 		return
@@ -72,7 +76,7 @@ func (a *API) WebauthnRegisterFinish(token string, request []byte) (res Webauthn
 		return
 	}
 
-	res.CredentialCreation = string(jsonCred)
+	res.Credential = string(jsonCred)
 
 	return
 }
@@ -105,6 +109,38 @@ func (a *API) WebauthnLoginBegin(entityId string) (res WebauthnLoginBeginResult,
 
 	res.WebauthnToken = token
 	res.CredentialAssertion = string(jsonCred)
+
+	return
+}
+
+func (a *API) WebauthnLoginFinish(webauthToken string, request []byte) (res WebauthnLoginFinishResult, err error) {
+	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeWebauthn, webauthToken)
+	if err != nil {
+		return
+	}
+
+	data, err := a.VolatileStorage.GetWebauthnSessionData(s.Id)
+	if err != nil {
+		return
+	}
+
+	creds, err := a.PersistentStorage.GetWebauthnCredentials(u.Id)
+	if err != nil {
+		return
+	}
+
+	// TODO: credential verification
+	_, err = authnweb.LoginFinish(u, data, creds, request, a.Config.WebAuthn)
+	if err != nil {
+		return
+	}
+
+	sssToken, _, err := a.CreateSessionAndJWT(sessions.ScopeLogin, u.Id)
+	if err != nil {
+		return
+	}
+
+	res.SessionToken = sssToken
 
 	return
 }

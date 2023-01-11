@@ -63,3 +63,64 @@ func (s clientgrpcServer) AuthenticateMachine(ctx context.Context, req *Authenti
 	}
 	return
 }
+
+func (s clientgrpcServer) InitValidation(ctx context.Context, req *InitValidationRequest) (res *InitValidationResponse, err error) {
+	r, err := s.Api.InitEntityValidation(req.SessionToken)
+	if err == nil {
+		res = &InitValidationResponse{
+			ValidationToken: r.ValidationToken,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) CompleteEntityValidation(ctx context.Context, req *CompleteValidationRequest) (res *CompleteValidationResponse, err error) {
+	r, err := s.Api.CompleteEntityValidation(req.ValidationToken)
+	if err == nil {
+		res = &CompleteValidationResponse{
+			SessionToken: r.SessionToken,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) BeginWebauthnRegister(ctx context.Context, req *BeginWebauthnRegisterRequest) (res *BeginWebauthnRegisterResponse, err error) {
+	r, err := s.Api.WebauthnRegisterBegin(req.SessionToken)
+	if err == nil {
+		res = &BeginWebauthnRegisterResponse{
+			CredentialCreation: r.CredentialCreation,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) FinishWebauthnRegister(ctx context.Context, req *FinishWebauthnRegisterRequest) (res *FinishWebauthnRegisterResponse, err error) {
+	r, err := s.Api.WebauthnRegisterFinish(req.SessionToken, req.Request)
+	if err == nil {
+		res = &FinishWebauthnRegisterResponse{
+			Credential: r.Credential,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) BeginWebauthnLogin(ctx context.Context, req *BeginWebauthnLoginRequest) (res *BeginWebauthnLoginResponse, err error) {
+	r, err := s.Api.WebauthnLoginBegin(req.Email)
+	if err == nil {
+		res = &BeginWebauthnLoginResponse{
+			WebauthToken:        r.WebauthnToken,
+			CredentialAssertion: r.CredentialAssertion,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) FinishWebauthnLogin(ctx context.Context, req *FinishWebauthnLoginRequest) (res *FinishWebauthnLoginResponse, err error) {
+	r, err := s.Api.WebauthnLoginFinish(req.WebauthToken, req.Request)
+	if err == nil {
+		res = &FinishWebauthnLoginResponse{
+			SessionToken: r.SessionToken,
+		}
+	}
+	return
+}

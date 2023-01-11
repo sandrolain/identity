@@ -111,3 +111,40 @@ func LoginBegin(entity entities.Entity, cfg config.WebAuthnConfig) (credAssert p
 
 	return
 }
+
+func LoginFinish(entity entities.Entity, sessionData webauthn.SessionData, creds []EntityCredential, requestBody []byte, cfg config.WebAuthnConfig) (credential EntityCredential, err error) {
+	u, err := url.Parse(cfg.Origin)
+	if err != nil {
+		err = fmt.Errorf("invalid webauthn origin: %v", err)
+		return
+	}
+
+	wa, err := webauthn.New(&webauthn.Config{
+		RPDisplayName: cfg.DisplayName,
+		RPID:          u.Hostname(),
+		RPOrigin:      cfg.Origin,
+	})
+	if err != nil {
+		return
+	}
+
+	user := NewUser(entity.Id)
+
+	bodyReader := io.NopCloser(bytes.NewReader(requestBody))
+	parsedResponse, err := protocol.ParseCredentialRequestResponseBody(bodyReader)
+	if err != nil {
+		return
+	}
+
+	cred, err := wa.ValidateLogin(user, sessionData, parsedResponse)
+	if err != nil {
+		return
+	}
+
+	credential = EntityCredential{
+		*cred,
+		entity.Id,
+	}
+
+	return
+}
