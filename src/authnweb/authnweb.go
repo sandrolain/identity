@@ -34,7 +34,7 @@ func RegisterBegin(entity entities.Entity, cfg config.WebAuthnConfig) (credCreat
 		return
 	}
 
-	user := NewUser(entity.Id)
+	user := NewUser(entity.Id, []EntityCredential{})
 
 	registerOptions := func(credCreationOpts *protocol.PublicKeyCredentialCreationOptions) {
 		credCreationOpts.CredentialExcludeList = user.CredentialExcludeList()
@@ -66,7 +66,7 @@ func RegisterFinish(entity entities.Entity, sessionData webauthn.SessionData, re
 		return
 	}
 
-	user := NewUser(entity.Id)
+	user := NewUser(entity.Id, []EntityCredential{})
 
 	r := http.Request{}
 	r.Body = io.NopCloser(bytes.NewReader(requestBody))
@@ -84,7 +84,7 @@ func RegisterFinish(entity entities.Entity, sessionData webauthn.SessionData, re
 	return
 }
 
-func LoginBegin(entity entities.Entity, cfg config.WebAuthnConfig) (credAssert protocol.CredentialAssertion, sessionData webauthn.SessionData, err error) {
+func LoginBegin(entity entities.Entity, creds []EntityCredential, cfg config.WebAuthnConfig) (credAssert protocol.CredentialAssertion, sessionData webauthn.SessionData, err error) {
 	u, err := url.Parse(cfg.Origin)
 	if err != nil {
 		err = fmt.Errorf("invalid webauthn origin: %v", err)
@@ -100,7 +100,7 @@ func LoginBegin(entity entities.Entity, cfg config.WebAuthnConfig) (credAssert p
 		return
 	}
 
-	user := NewUser(entity.Id)
+	user := NewUser(entity.Id, creds)
 
 	ca, sd, err := wa.BeginLogin(user)
 	if err != nil {
@@ -128,7 +128,7 @@ func LoginFinish(entity entities.Entity, sessionData webauthn.SessionData, creds
 		return
 	}
 
-	user := NewUser(entity.Id)
+	user := NewUser(entity.Id, creds)
 
 	bodyReader := io.NopCloser(bytes.NewReader(requestBody))
 	parsedResponse, err := protocol.ParseCredentialRequestResponseBody(bodyReader)

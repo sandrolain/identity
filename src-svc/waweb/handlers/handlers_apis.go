@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -51,7 +52,6 @@ func LoginConfirm(c *fiber.Ctx) (err error) {
 		return
 	}
 	greq := &clientgrpc.LoginConfirmRequest{TotpToken: totpToken, TotpCode: req.TotpCode}
-	fmt.Printf("greq: %+v\n", *greq)
 	res, err := grpcCLient.LoginConfirm(c.UserContext(), greq)
 	if err != nil {
 		return
@@ -70,11 +70,38 @@ func BeginWebauthnRegister(c *fiber.Ctx) (err error) {
 	if err != nil {
 		return err
 	}
+
+	var r interface{}
+	err = json.Unmarshal([]byte(res.CredentialCreation), &r)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(r)
+}
+
+func FinishWebauthnRegister(c *fiber.Ctx) (err error) {
+	sessionToken, err := getBearerToken(c)
+	if err != nil {
+		return
+	}
+	res, err := grpcCLient.FinishWebauthnRegister(c.UserContext(), &clientgrpc.FinishWebauthnRegisterRequest{
+		SessionToken: sessionToken,
+		Request:      c.Body(),
+	})
+	if err != nil {
+		return err
+	}
 	return c.JSON(res)
 }
 
 type BeginWebauthnLoginRequest struct {
 	Email string `json:"email" form:"email"`
+}
+
+type BeginWebauthnLoginResponse struct {
+	WebauthnToken       string      `json:"webauthnToken"`
+	CredentialAssertion interface{} `json:"credentialAssertion"`
 }
 
 func BeginWebauthnLogin(c *fiber.Ctx) (err error) {
@@ -84,6 +111,31 @@ func BeginWebauthnLogin(c *fiber.Ctx) (err error) {
 	}
 	res, err := grpcCLient.BeginWebauthnLogin(c.UserContext(), &clientgrpc.BeginWebauthnLoginRequest{
 		Email: req.Email,
+	})
+	if err != nil {
+		return err
+	}
+
+	var r interface{}
+	err = json.Unmarshal([]byte(res.CredentialAssertion), &r)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(BeginWebauthnLoginResponse{
+		WebauthnToken:       res.WebauthnToken,
+		CredentialAssertion: r,
+	})
+}
+
+func FinishWebauthnLogin(c *fiber.Ctx) (err error) {
+	waToken, err := getBearerToken(c)
+	if err != nil {
+		return
+	}
+	res, err := grpcCLient.FinishWebauthnLogin(c.UserContext(), &clientgrpc.FinishWebauthnLoginRequest{
+		WebauthnToken: waToken,
+		Request:       c.Body(),
 	})
 	if err != nil {
 		return err

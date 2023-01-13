@@ -40,6 +40,7 @@ const (
 	ENV_ADMIN_KEY_FILE   = "ID_ADMIN_KEY_FILE"
 	ENV_CLIENT_CERT_FILE = "ID_CLIENT_CERT_FILE"
 	ENV_CLIENT_KEY_FILE  = "ID_CLIENT_KEY_FILE"
+	ENV_WEBAUTHN_ORIGIN  = "ID_WEBAUTHN_ORIGIN"
 )
 
 type RecoveryTokensConfig struct {
@@ -158,6 +159,10 @@ func GetDefaultConfiguration() Config {
 			Password: "",
 			Timeout:  DEF_REDIS_TIMEOUT,
 		},
+		WebAuthn: WebAuthnConfig{
+			DisplayName: "",
+			Origin:      "",
+		},
 	}
 }
 
@@ -235,6 +240,14 @@ func GetConfiguration() (cfg Config, err error) {
 		return
 	}
 
+	waOrigin, err := envutils.RequireEnvString(ENV_WEBAUTHN_ORIGIN)
+	if err != nil {
+		err = formatError(ENV_WEBAUTHN_ORIGIN, err)
+		return
+	}
+
+	waDisplayName := waOrigin
+
 	cfg = GetDefaultConfiguration()
 	cfg.AdminGrpc.CertFile = adminCertFile
 	cfg.AdminGrpc.KeyFile = adminKeyFile
@@ -246,6 +259,8 @@ func GetConfiguration() (cfg Config, err error) {
 	cfg.MongoDb.Uri = mongoDbURI
 	cfg.Redis.Host = redisHost
 	cfg.Redis.Password = redisPassword
+	cfg.WebAuthn.DisplayName = waDisplayName
+	cfg.WebAuthn.Origin = waOrigin
 
 	return
 }

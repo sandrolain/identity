@@ -21,7 +21,8 @@ func (s clientgrpcServer) LoginConfirm(ctx context.Context, req *LoginConfirmReq
 	r, err := s.Api.LoginTotp(req.TotpToken, req.TotpCode)
 	if err == nil {
 		res = &LoginConfirmResponse{
-			SessionToken: r.SessionToken,
+			SessionToken:    r.SessionToken,
+			ValidationToken: r.ValidationToken,
 		}
 	}
 	return
@@ -98,7 +99,7 @@ func (s clientgrpcServer) FinishWebauthnRegister(ctx context.Context, req *Finis
 	r, err := s.Api.WebauthnRegisterFinish(req.SessionToken, req.Request)
 	if err == nil {
 		res = &FinishWebauthnRegisterResponse{
-			Credential: r.Credential,
+			SessionToken: r.SessionToken,
 		}
 	}
 	return
@@ -108,7 +109,7 @@ func (s clientgrpcServer) BeginWebauthnLogin(ctx context.Context, req *BeginWeba
 	r, err := s.Api.WebauthnLoginBegin(req.Email)
 	if err == nil {
 		res = &BeginWebauthnLoginResponse{
-			WebauthToken:        r.WebauthnToken,
+			WebauthnToken:       r.WebauthnToken,
 			CredentialAssertion: r.CredentialAssertion,
 		}
 	}
@@ -116,7 +117,7 @@ func (s clientgrpcServer) BeginWebauthnLogin(ctx context.Context, req *BeginWeba
 }
 
 func (s clientgrpcServer) FinishWebauthnLogin(ctx context.Context, req *FinishWebauthnLoginRequest) (res *FinishWebauthnLoginResponse, err error) {
-	r, err := s.Api.WebauthnLoginFinish(req.WebauthToken, req.Request)
+	r, err := s.Api.WebauthnLoginFinish(req.WebauthnToken, req.Request)
 	if err == nil {
 		res = &FinishWebauthnLoginResponse{
 			SessionToken: r.SessionToken,

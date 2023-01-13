@@ -16,7 +16,7 @@ export function getData(el: HTMLFormElement) {
   return res
 }
 
-export async function post<T=any>(url: string, data: Data, token?: string): Promise<T> {
+export async function post<T=any>(url: string, data: any, token?: string): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json"
   };
@@ -29,4 +29,26 @@ export async function post<T=any>(url: string, data: Data, token?: string): Prom
     headers
   });
   return res.json();
+}
+
+// Base64 to ArrayBuffer
+export function bufferDecode(value: string) {
+  value = value
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+  // Pad out with standard base64 required padding characters
+  var pad = value.length % 4;
+  if (pad) {
+    if(pad === 1) {
+      throw new Error('InvalidLengthError: Input base64url string is the wrong length to determine padding');
+    }
+    value += new Array(5-pad).join('=');
+  }
+  return Uint8Array.from(atob(value), c => c.charCodeAt(0));
+}
+export function bufferEncode(value: ArrayBuffer) {
+  return btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(value))))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 }

@@ -71,7 +71,7 @@ message FinishWebauthnRegisterRequest {
 }
 
 message FinishWebauthnRegisterResponse {
-  string credential = 1;
+  string sessionToken = 1;
 }
 
 message BeginWebauthnLoginRequest {
@@ -79,12 +79,12 @@ message BeginWebauthnLoginRequest {
 }
 
 message BeginWebauthnLoginResponse {
-  string webauthToken = 1;
+  string webauthnToken = 1;
   string credentialAssertion = 2;
 }
 
 message FinishWebauthnLoginRequest {
-  string webauthToken = 1;
+  string webauthnToken = 1;
   bytes request = 2;
 }
 

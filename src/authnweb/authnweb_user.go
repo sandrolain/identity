@@ -14,11 +14,16 @@ type User struct {
 }
 
 // NewUser creates and returns a new User
-func NewUser(email string) *User {
+func NewUser(email string, creds []EntityCredential) *User {
 	user := &User{}
 	user.id = email
 	user.name = email
 	user.displayName = email
+
+	for _, cred := range creds {
+		user.AddCredential(cred.Credential)
+	}
+
 	return user
 }
 

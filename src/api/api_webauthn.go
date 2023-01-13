@@ -12,7 +12,7 @@ type WebauthnRegisterBeginResult struct {
 }
 
 type WebauthnRegisterFinishnResult struct {
-	Credential string
+	SessionToken string
 }
 
 type WebauthnLoginBeginResult struct {
@@ -71,12 +71,7 @@ func (a *API) WebauthnRegisterFinish(token string, request []byte) (res Webauthn
 		return
 	}
 
-	jsonCred, err := json.Marshal(cred)
-	if err != nil {
-		return
-	}
-
-	res.Credential = string(jsonCred)
+	res.SessionToken = token // TODO: generate new session??
 
 	return
 }
@@ -87,7 +82,12 @@ func (a *API) WebauthnLoginBegin(entityId string) (res WebauthnLoginBeginResult,
 		return
 	}
 
-	cred, data, err := authnweb.LoginBegin(u, a.Config.WebAuthn)
+	creds, err := a.PersistentStorage.GetWebauthnCredentials(u.Id)
+	if err != nil {
+		return
+	}
+
+	cred, data, err := authnweb.LoginBegin(u, creds, a.Config.WebAuthn)
 	if err != nil {
 		return
 	}

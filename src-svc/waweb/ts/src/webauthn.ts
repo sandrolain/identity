@@ -1,23 +1,16 @@
-import { post } from "./lib.js";
+import { bufferDecode, bufferEncode, post } from "./lib.js";
 
-export async function webauthRegister(token: string, email: string) {
-
-  post("./api/")
-
-  const res = await fetch('/.netlify/functions/registerBegin?email=' + encodeURIComponent(email));
-  const credentialCreationOptions = await res.json()
-
-
-  credentialCreationOptions.publicKey.challenge = bufferDecode(credentialCreationOptions.publicKey.challenge);
-  credentialCreationOptions.publicKey.user.id = bufferDecode(credentialCreationOptions.publicKey.user.id);
-
-  const {publicKey} = credentialCreationOptions;
-
-  const credential = await navigator.credentials.create({publicKey})
-
+export async function webauthnRegister(token: string): Promise<{sessionToken: string}> {
+  const credentialCreation = await post("./api/webauthn/beginRegister", null, token)
+  const {publicKey} = credentialCreation;
+  publicKey.challenge = bufferDecode(publicKey.challenge);
+  publicKey.user.id   = bufferDecode(publicKey.user.id);
+  const credential = await navigator.credentials.create({publicKey}) as PublicKeyCredential;
+  if (!credential) {
+    throw new Error("Unable to create new credential");
+  }
   const {id, type, rawId} = credential;
-  const {attestationObject, clientDataJSON} = credential.response;
-
+  const {attestationObject, clientDataJSON} = credential.response as AuthenticatorAttestationResponse;
   const data = {
     id,
     type,
@@ -26,15 +19,33 @@ export async function webauthRegister(token: string, email: string) {
       attestationObject: bufferEncode(attestationObject),
       clientDataJSON: bufferEncode(clientDataJSON),
     }
+  };
+  return await post("./api/webauthn/finishRegister", data, token) as {sessionToken: string};
+}
+
+export async function webauthnLogin(email: string): Promise<{sessionToken: string}> {
+  const {credentialAssertion, webauthnToken} = await post("./api/webauthn/beginLogin", {email})
+  const {publicKey} = credentialAssertion;
+  publicKey.challenge = bufferDecode(publicKey.challenge);
+  publicKey.allowCredentials.forEach(function (listItem: any) {
+    listItem.id = bufferDecode(listItem.id)
+  });
+  const credential = await navigator.credentials.get({publicKey}) as PublicKeyCredential;
+  if (!credential) {
+    throw new Error("Unable to request credential");
   }
-  console.log("🚀 ~ file: main.js ~ line 24 ~ registerUser ~ data", data)
-
-  const finishResponse = await fetch('/.netlify/functions/registerFinish?email=' + encodeURIComponent(email), {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  const finishData = await finishResponse.json();
-  console.log("🚀 ~ file: main.js ~ line 38 ~ registerUser ~ finishData", finishData)
-
-  alert("successfully registered !")
+  const {id, type, rawId} = credential;
+  const {authenticatorData, clientDataJSON, signature, userHandle} = credential.response as AuthenticatorAssertionResponse;
+  const data = {
+    id,
+    type,
+    rawId: bufferEncode(rawId),
+    response: {
+      authenticatorData: bufferEncode(authenticatorData),
+      clientDataJSON: bufferEncode(clientDataJSON),
+      signature: bufferEncode(signature),
+      userHandle: userHandle ? bufferEncode(userHandle) : null
+    }
+  };
+  return await post("./api/webauthn/finishLogin", data, webauthnToken) as {sessionToken: string};
 }
