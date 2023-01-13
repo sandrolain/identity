@@ -7,7 +7,6 @@ replace github.com/sandrolain/go-utilities => ./go-utilities
 require (
 	github.com/go-webauthn/webauthn v0.6.0
 	github.com/gofiber/fiber/v2 v2.41.0
-	github.com/gofiber/template v1.7.3
 	github.com/pquerna/otp v1.4.0
 	github.com/sandrolain/go-utilities v0.0.0-00010101000000-000000000000
 	github.com/segmentio/ksuid v1.0.4
@@ -22,6 +21,7 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-webauthn/revoke v0.1.6 // indirect
@@ -33,6 +33,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect

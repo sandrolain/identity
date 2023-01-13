@@ -4,24 +4,26 @@ Identity Service as GoLang Exercise
 
 ## ToDo
 
+- [ ] User "internal" package
 - [x] Env Config: Password Strength validation
 - [x] Machine APIs: IP validation
 - [ ] Machine APIs: Issuer validation
 - [ ] Machine APIs: JWT creation date validation (less than ...)
 - [ ] gRPC: mTLS
-- [ ] Roles package
+- [x] Roles package
 - [ ] Admin APIs authorized with roles
 - User:
   - Until validation can only request validation token after login
   - [ ] Registration
-    - [ ] Email validation token
-    - [ ] Email validation completion
+    - [x] Email validation token
+    - [x] Email validation completion
   - [ ] Password reset
     - [ ] Token generation
     - [ ] Reset completion
   - [x] Logout
-  - [ ] WebAuthn: Association
-  - [ ] WebAuthn: Login
+  - [x] WebAuthn: Association
+  - [x] WebAuthn: Login
+    - [ ] As 2FA after login with password
 - Admin:
   - [ ] Edit user
   - [ ] Edit machine
@@ -36,7 +38,7 @@ Identity Service as GoLang Exercise
 
 ## To Evaluate
 - Use og msgpack instead of gob
-- 
+  
 
 
 ## Premises
