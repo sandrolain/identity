@@ -66,7 +66,7 @@ func (s clientgrpcServer) AuthenticateMachine(ctx context.Context, req *Authenti
 }
 
 func (s clientgrpcServer) InitValidation(ctx context.Context, req *InitValidationRequest) (res *InitValidationResponse, err error) {
-	r, err := s.Api.InitEntityValidation(req.SessionToken)
+	r, err := s.Api.InitEntityValidation(entities.TypeUser, req.Email)
 	if err == nil {
 		res = &InitValidationResponse{
 			ValidationToken: r.ValidationToken,
@@ -75,10 +75,31 @@ func (s clientgrpcServer) InitValidation(ctx context.Context, req *InitValidatio
 	return
 }
 
-func (s clientgrpcServer) CompleteEntityValidation(ctx context.Context, req *CompleteValidationRequest) (res *CompleteValidationResponse, err error) {
-	r, err := s.Api.CompleteEntityValidation(req.ValidationToken)
+func (s clientgrpcServer) VerifyValidation(ctx context.Context, req *VerifyValidationRequest) (res *VerifyValidationResponse, err error) {
+	r, err := s.Api.VerifyEntityValidation(entities.TypeUser, req.ValidationToken)
+	if err == nil {
+		res = &VerifyValidationResponse{
+			TotpToken: r.TotpToken,
+			TotpUri:   r.TotpUri,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) CompleteValidation(ctx context.Context, req *CompleteValidationRequest) (res *CompleteValidationResponse, err error) {
+	r, err := s.Api.CompleteEntityValidation(entities.TypeUser, req.TotpToken, req.TotpCode)
 	if err == nil {
 		res = &CompleteValidationResponse{
+			SessionToken: r.SessionToken,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) PasswordChange(ctx context.Context, req *PasswordChangeRequest) (res *PasswordChangeResponse, err error) {
+	r, err := s.Api.EntityPasswordChange(req.SessionToken, req.TotpCode, req.Password)
+	if err == nil {
+		res = &PasswordChangeResponse{
 			SessionToken: r.SessionToken,
 		}
 	}

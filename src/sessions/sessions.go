@@ -17,7 +17,7 @@ const (
 	ScopeTotp       SessionScope = "otp"
 	ScopeValidation SessionScope = "vld"
 	ScopeLogin      SessionScope = "sid"
-	ScopePassword   SessionScope = "pwd"
+	ScopeAuthChange SessionScope = "aut"
 	ScopeWebauthn   SessionScope = "wau"
 	ScopeMachine    SessionScope = "mac"
 )

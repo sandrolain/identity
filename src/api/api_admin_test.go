@@ -75,17 +75,27 @@ func TestAdminMachineManagement(t *testing.T) {
 		t.Fatal("Validation token should NOT be empty for not validate users")
 	}
 
-	res2a, err := a.CompleteEntityValidation(res2.ValidationToken)
+	code, err = u.GenerateTotp()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	res3, err := a.CreateMachine(res2a.SessionToken, "machine@sandrolain.com", []string{})
+	res2a, err := a.VerifyEntityValidation(entities.TypeAdmin, res2.ValidationToken)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	res4, err := a.InitMachineSession(res2a.SessionToken, res3.MachineId, []string{"192.168.1.0/25", "127.0.0.1"})
+	res2b, err := a.CompleteEntityValidation(entities.TypeAdmin, res2a.TotpToken, code)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res3, err := a.CreateMachine(res2b.SessionToken, "machine@sandrolain.com", []string{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res4, err := a.InitMachineSession(res2b.SessionToken, res3.MachineId, []string{"192.168.1.0/25", "127.0.0.1"})
 	if err != nil {
 		t.Fatal(err)
 	}

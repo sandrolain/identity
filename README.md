@@ -15,15 +15,20 @@ Identity Service as GoLang Exercise
 - User:
   - Until validation can only request validation token after login
   - [ ] Registration
+    - [ ] Registration API?
     - [x] Email validation token
     - [x] Email validation completion
-  - [ ] Password reset
-    - [ ] Token generation
-    - [ ] Reset completion
+  - [x] Password change
+    - [x] Token generation
+    - [x] Reset completion
   - [x] Logout
   - [x] WebAuthn: Association
   - [x] WebAuthn: Login
-    - [ ] As 2FA after login with password
+    - [ ] As 2FA after login with password?
+  - [ ] Destroy entity
+    - [ ] Enforcement with totp request
+  - [ ] ValidatePassword
+  - [ ] ValidateEmail
 - Admin:
   - [ ] Edit user
   - [ ] Edit machine
@@ -34,6 +39,9 @@ Identity Service as GoLang Exercise
   - [ ] Reset machine sessions
   - [ ] List machine sessions
   - [ ] Logout
+  - [ ] Invalidate entity
+  - [ ] Destroy entity
+    - [ ] Require role?
 - Convert internal errors into public messages according to the type of error
 
 ## To Evaluate

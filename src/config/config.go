@@ -81,12 +81,12 @@ type SecureKeyConfig struct {
 }
 
 type SessionConfig struct {
-	TotpRequestMinutes    int
-	ValidationMinutes     int
-	LoginSessionMinutes   int
-	MachineKeyMinutes     int
-	ChangePasswordMinutes int
-	WebauthLoginMinutes   int
+	TotpRequestMinutes  int
+	ValidationMinutes   int
+	LoginSessionMinutes int
+	MachineKeyMinutes   int
+	AuthChangeMinutes   int
+	WebauthLoginMinutes int
 }
 
 type LoginConfig struct {
@@ -138,12 +138,12 @@ func GetDefaultConfiguration() Config {
 			Issuer: DEF_JWT_ISSUER,
 		},
 		Session: SessionConfig{
-			TotpRequestMinutes:    DEF_TOTP_REQUEST_MINUTES,
-			ValidationMinutes:     DEF_VALIDATION_MINUTES,
-			LoginSessionMinutes:   DEF_LOGIN_SESSION_MINUTES,
-			MachineKeyMinutes:     DEF_MACHINE_KEY_MINUTES,
-			ChangePasswordMinutes: DEF_CHANGE_PASSWORD_MINUTES,
-			WebauthLoginMinutes:   DEF_WEBAUTHN_LOGIN_MINUTES,
+			TotpRequestMinutes:  DEF_TOTP_REQUEST_MINUTES,
+			ValidationMinutes:   DEF_VALIDATION_MINUTES,
+			LoginSessionMinutes: DEF_LOGIN_SESSION_MINUTES,
+			MachineKeyMinutes:   DEF_MACHINE_KEY_MINUTES,
+			AuthChangeMinutes:   DEF_CHANGE_PASSWORD_MINUTES,
+			WebauthLoginMinutes: DEF_WEBAUTHN_LOGIN_MINUTES,
 		},
 		Login: LoginConfig{
 			MaxFails:       DEF_LOGIN_MAX_FAILS,

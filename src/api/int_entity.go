@@ -55,3 +55,36 @@ func (a *API) DeleteEntity(username string) error {
 	}
 	return a.PersistentStorage.DeleteEntity(username)
 }
+
+func (a *API) getTotpUri(u *entities.Entity) (uri string, err error) {
+	if !u.TotpConfigured {
+		err = u.ResetTotp(a.Config.Totp)
+		if err != nil {
+			return
+		}
+		err = a.PersistentStorage.SaveEntity(*u)
+		if err != nil {
+			return
+		}
+	}
+	uri = u.TotpUri
+	return
+}
+
+func (a *API) validateTotp(u *entities.Entity, totpCode string) (err error) {
+	totpOk, err := u.ValidateTotp(totpCode)
+	if err != nil {
+		return
+	}
+
+	if !totpOk {
+		err = crudutils.NotAuthorized("")
+		return
+	}
+
+	if !u.TotpConfigured {
+		u.SetTotpConfigured(true)
+		err = a.PersistentStorage.SaveEntity(*u)
+	}
+	return
+}

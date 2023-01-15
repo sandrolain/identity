@@ -93,33 +93,55 @@ message FinishWebauthnLoginResponse {
 }
 
 message InitValidationRequest {
-  string sessionToken = 1;
+  string email = 1;
 }
 
 message InitValidationResponse {
   string validationToken = 1;
 }
 
-message CompleteValidationRequest {
+message VerifyValidationRequest {
   string validationToken = 1;
+}
+
+message VerifyValidationResponse {
+  string totpToken = 1;
+  string totpUri = 2;
+}
+
+message CompleteValidationRequest {
+  string totpToken = 1;
+  string totpCode = 2;
 }
 
 message CompleteValidationResponse {
   string sessionToken = 1;
 }
 
+message PasswordChangeRequest {
+  string sessionToken = 1;
+  string totpCode = 2;
+  string password = 3;
+}
+
+message PasswordChangeResponse {
+  string sessionToken = 1;
+}
 
 
 service ClientService {
+  // User APIs
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
   rpc InitValidation(InitValidationRequest) returns (InitValidationResponse);
   rpc CompleteValidation(CompleteValidationRequest) returns (CompleteValidationResponse);
   rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
+  rpc PasswordChange(PasswordChangeRequest) returns (PasswordChangeResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
-  rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
   rpc BeginWebauthnRegister(BeginWebauthnRegisterRequest) returns (BeginWebauthnRegisterResponse);
   rpc FinishWebauthnRegister(FinishWebauthnRegisterRequest) returns (FinishWebauthnRegisterResponse);
   rpc BeginWebauthnLogin(BeginWebauthnLoginRequest) returns (BeginWebauthnLoginResponse);
   rpc FinishWebauthnLogin(FinishWebauthnLoginRequest) returns (FinishWebauthnLoginResponse);
+  // Machine APIs
+  rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
 }

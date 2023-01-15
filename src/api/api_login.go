@@ -54,41 +54,25 @@ func (a *API) Login(entityType entities.EntityType, entityId string, password st
 
 	res.TotpToken = token
 
-	if !u.TotpConfigured {
-		err = u.ResetTotp(a.Config.Totp)
-		if err != nil {
-			return
-		}
-		err = a.PersistentStorage.SaveEntity(u)
-		if err != nil {
-			return
-		}
-		res.TotpUri = u.TotpUri
+	totpUri, err := a.getTotpUri(&u)
+	if err != nil {
+		return
 	}
+
+	res.TotpUri = totpUri
 
 	return
 }
 
-func (a *API) LoginTotp(token string, otp string) (res LoginTotpResult, err error) {
+func (a *API) LoginTotp(token string, totpCode string) (res LoginTotpResult, err error) {
 	u, s, err := a.AuthenticateWithSessionJWT(sessions.ScopeTotp, token)
 	if err != nil {
 		return
 	}
-	totpOk, err := u.ValidateTotp(otp)
+
+	err = a.validateTotp(&u, totpCode)
 	if err != nil {
 		return
-	}
-	if !totpOk {
-		err = crudutils.NotAuthorized("")
-		return
-	}
-
-	if !u.TotpConfigured {
-		u.SetTotpConfigured(true)
-		err = a.PersistentStorage.SaveEntity(u)
-		if err != nil {
-			return
-		}
 	}
 
 	var sssToken string

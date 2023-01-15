@@ -32,8 +32,8 @@ func (a *API) GetSessionScopeDuration(scope sessions.SessionScope) (dur time.Dur
 		minutes = a.Config.Session.LoginSessionMinutes
 	case sessions.ScopeMachine:
 		minutes = a.Config.Session.MachineKeyMinutes
-	case sessions.ScopePassword:
-		minutes = a.Config.Session.ChangePasswordMinutes
+	case sessions.ScopeAuthChange:
+		minutes = a.Config.Session.AuthChangeMinutes
 	case sessions.ScopeWebauthn:
 		minutes = a.Config.Session.WebauthLoginMinutes
 	}

@@ -22,17 +22,20 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ClientServiceClient interface {
+	// User APIs
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error)
 	InitValidation(ctx context.Context, in *InitValidationRequest, opts ...grpc.CallOption) (*InitValidationResponse, error)
 	CompleteValidation(ctx context.Context, in *CompleteValidationRequest, opts ...grpc.CallOption) (*CompleteValidationResponse, error)
 	GetUserDetails(ctx context.Context, in *GetUserDetailsRequest, opts ...grpc.CallOption) (*GetUserDetailsResponse, error)
+	PasswordChange(ctx context.Context, in *PasswordChangeRequest, opts ...grpc.CallOption) (*PasswordChangeResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
-	AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error)
 	BeginWebauthnRegister(ctx context.Context, in *BeginWebauthnRegisterRequest, opts ...grpc.CallOption) (*BeginWebauthnRegisterResponse, error)
 	FinishWebauthnRegister(ctx context.Context, in *FinishWebauthnRegisterRequest, opts ...grpc.CallOption) (*FinishWebauthnRegisterResponse, error)
 	BeginWebauthnLogin(ctx context.Context, in *BeginWebauthnLoginRequest, opts ...grpc.CallOption) (*BeginWebauthnLoginResponse, error)
 	FinishWebauthnLogin(ctx context.Context, in *FinishWebauthnLoginRequest, opts ...grpc.CallOption) (*FinishWebauthnLoginResponse, error)
+	// Machine APIs
+	AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error)
 }
 
 type clientServiceClient struct {
@@ -88,18 +91,18 @@ func (c *clientServiceClient) GetUserDetails(ctx context.Context, in *GetUserDet
 	return out, nil
 }
 
-func (c *clientServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
-	out := new(LogoutResponse)
-	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/Logout", in, out, opts...)
+func (c *clientServiceClient) PasswordChange(ctx context.Context, in *PasswordChangeRequest, opts ...grpc.CallOption) (*PasswordChangeResponse, error) {
+	out := new(PasswordChangeResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/PasswordChange", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *clientServiceClient) AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error) {
-	out := new(AuthenticateMachineResponse)
-	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/AuthenticateMachine", in, out, opts...)
+func (c *clientServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
+	out := new(LogoutResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/Logout", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,21 +145,33 @@ func (c *clientServiceClient) FinishWebauthnLogin(ctx context.Context, in *Finis
 	return out, nil
 }
 
+func (c *clientServiceClient) AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error) {
+	out := new(AuthenticateMachineResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/AuthenticateMachine", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClientServiceServer is the server API for ClientService service.
 // All implementations must embed UnimplementedClientServiceServer
 // for forward compatibility
 type ClientServiceServer interface {
+	// User APIs
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error)
 	InitValidation(context.Context, *InitValidationRequest) (*InitValidationResponse, error)
 	CompleteValidation(context.Context, *CompleteValidationRequest) (*CompleteValidationResponse, error)
 	GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error)
+	PasswordChange(context.Context, *PasswordChangeRequest) (*PasswordChangeResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
-	AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error)
 	BeginWebauthnRegister(context.Context, *BeginWebauthnRegisterRequest) (*BeginWebauthnRegisterResponse, error)
 	FinishWebauthnRegister(context.Context, *FinishWebauthnRegisterRequest) (*FinishWebauthnRegisterResponse, error)
 	BeginWebauthnLogin(context.Context, *BeginWebauthnLoginRequest) (*BeginWebauthnLoginResponse, error)
 	FinishWebauthnLogin(context.Context, *FinishWebauthnLoginRequest) (*FinishWebauthnLoginResponse, error)
+	// Machine APIs
+	AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error)
 	mustEmbedUnimplementedClientServiceServer()
 }
 
@@ -179,11 +194,11 @@ func (UnimplementedClientServiceServer) CompleteValidation(context.Context, *Com
 func (UnimplementedClientServiceServer) GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserDetails not implemented")
 }
+func (UnimplementedClientServiceServer) PasswordChange(context.Context, *PasswordChangeRequest) (*PasswordChangeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PasswordChange not implemented")
+}
 func (UnimplementedClientServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
-}
-func (UnimplementedClientServiceServer) AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateMachine not implemented")
 }
 func (UnimplementedClientServiceServer) BeginWebauthnRegister(context.Context, *BeginWebauthnRegisterRequest) (*BeginWebauthnRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BeginWebauthnRegister not implemented")
@@ -196,6 +211,9 @@ func (UnimplementedClientServiceServer) BeginWebauthnLogin(context.Context, *Beg
 }
 func (UnimplementedClientServiceServer) FinishWebauthnLogin(context.Context, *FinishWebauthnLoginRequest) (*FinishWebauthnLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinishWebauthnLogin not implemented")
+}
+func (UnimplementedClientServiceServer) AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateMachine not implemented")
 }
 func (UnimplementedClientServiceServer) mustEmbedUnimplementedClientServiceServer() {}
 
@@ -300,6 +318,24 @@ func _ClientService_GetUserDetails_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_PasswordChange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PasswordChangeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).PasswordChange(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/PasswordChange",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).PasswordChange(ctx, req.(*PasswordChangeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClientService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LogoutRequest)
 	if err := dec(in); err != nil {
@@ -314,24 +350,6 @@ func _ClientService_Logout_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ClientServiceServer).Logout(ctx, req.(*LogoutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ClientService_AuthenticateMachine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AuthenticateMachineRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ClientServiceServer).AuthenticateMachine(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/clientgrpc.ClientService/AuthenticateMachine",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClientServiceServer).AuthenticateMachine(ctx, req.(*AuthenticateMachineRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -408,6 +426,24 @@ func _ClientService_FinishWebauthnLogin_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_AuthenticateMachine_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthenticateMachineRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).AuthenticateMachine(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/AuthenticateMachine",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).AuthenticateMachine(ctx, req.(*AuthenticateMachineRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClientService_ServiceDesc is the grpc.ServiceDesc for ClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -436,12 +472,12 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ClientService_GetUserDetails_Handler,
 		},
 		{
-			MethodName: "Logout",
-			Handler:    _ClientService_Logout_Handler,
+			MethodName: "PasswordChange",
+			Handler:    _ClientService_PasswordChange_Handler,
 		},
 		{
-			MethodName: "AuthenticateMachine",
-			Handler:    _ClientService_AuthenticateMachine_Handler,
+			MethodName: "Logout",
+			Handler:    _ClientService_Logout_Handler,
 		},
 		{
 			MethodName: "BeginWebauthnRegister",
@@ -458,6 +494,10 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FinishWebauthnLogin",
 			Handler:    _ClientService_FinishWebauthnLogin_Handler,
+		},
+		{
+			MethodName: "AuthenticateMachine",
+			Handler:    _ClientService_AuthenticateMachine_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
