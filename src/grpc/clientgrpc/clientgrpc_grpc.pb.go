@@ -36,6 +36,9 @@ type ClientServiceClient interface {
 	FinishWebauthnLogin(ctx context.Context, in *FinishWebauthnLoginRequest, opts ...grpc.CallOption) (*FinishWebauthnLoginResponse, error)
 	// Machine APIs
 	AuthenticateMachine(ctx context.Context, in *AuthenticateMachineRequest, opts ...grpc.CallOption) (*AuthenticateMachineResponse, error)
+	// Other
+	ValidateEmail(ctx context.Context, in *ValidateEmailRequest, opts ...grpc.CallOption) (*ValidateEmailResponse, error)
+	ValidatePassword(ctx context.Context, in *ValidatePasswordRequest, opts ...grpc.CallOption) (*ValidatePasswordResponse, error)
 }
 
 type clientServiceClient struct {
@@ -154,6 +157,24 @@ func (c *clientServiceClient) AuthenticateMachine(ctx context.Context, in *Authe
 	return out, nil
 }
 
+func (c *clientServiceClient) ValidateEmail(ctx context.Context, in *ValidateEmailRequest, opts ...grpc.CallOption) (*ValidateEmailResponse, error) {
+	out := new(ValidateEmailResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/ValidateEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientServiceClient) ValidatePassword(ctx context.Context, in *ValidatePasswordRequest, opts ...grpc.CallOption) (*ValidatePasswordResponse, error) {
+	out := new(ValidatePasswordResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/ValidatePassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ClientServiceServer is the server API for ClientService service.
 // All implementations must embed UnimplementedClientServiceServer
 // for forward compatibility
@@ -172,6 +193,9 @@ type ClientServiceServer interface {
 	FinishWebauthnLogin(context.Context, *FinishWebauthnLoginRequest) (*FinishWebauthnLoginResponse, error)
 	// Machine APIs
 	AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error)
+	// Other
+	ValidateEmail(context.Context, *ValidateEmailRequest) (*ValidateEmailResponse, error)
+	ValidatePassword(context.Context, *ValidatePasswordRequest) (*ValidatePasswordResponse, error)
 	mustEmbedUnimplementedClientServiceServer()
 }
 
@@ -214,6 +238,12 @@ func (UnimplementedClientServiceServer) FinishWebauthnLogin(context.Context, *Fi
 }
 func (UnimplementedClientServiceServer) AuthenticateMachine(context.Context, *AuthenticateMachineRequest) (*AuthenticateMachineResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthenticateMachine not implemented")
+}
+func (UnimplementedClientServiceServer) ValidateEmail(context.Context, *ValidateEmailRequest) (*ValidateEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateEmail not implemented")
+}
+func (UnimplementedClientServiceServer) ValidatePassword(context.Context, *ValidatePasswordRequest) (*ValidatePasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidatePassword not implemented")
 }
 func (UnimplementedClientServiceServer) mustEmbedUnimplementedClientServiceServer() {}
 
@@ -444,6 +474,42 @@ func _ClientService_AuthenticateMachine_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_ValidateEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).ValidateEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/ValidateEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).ValidateEmail(ctx, req.(*ValidateEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClientService_ValidatePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidatePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).ValidatePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/ValidatePassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).ValidatePassword(ctx, req.(*ValidatePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ClientService_ServiceDesc is the grpc.ServiceDesc for ClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -498,6 +564,14 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AuthenticateMachine",
 			Handler:    _ClientService_AuthenticateMachine_Handler,
+		},
+		{
+			MethodName: "ValidateEmail",
+			Handler:    _ClientService_ValidateEmail_Handler,
+		},
+		{
+			MethodName: "ValidatePassword",
+			Handler:    _ClientService_ValidatePassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -43,6 +43,8 @@ Identity Service as GoLang Exercise
   - [ ] Destroy entity
     - [ ] Require role?
 - Convert internal errors into public messages according to the type of error
+- Security controls
+  - [ ] Fails counter (wait to retry afer 3 attempts)
 
 ## To Evaluate
 - Use og msgpack instead of gob

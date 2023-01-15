@@ -128,6 +128,22 @@ message PasswordChangeResponse {
   string sessionToken = 1;
 }
 
+message ValidateEmailRequest {
+  string email = 1;
+}
+
+message ValidateEmailResponse {
+  bool valid = 1;
+}
+
+message ValidatePasswordRequest {
+  string password = 1;
+}
+
+message ValidatePasswordResponse {
+  bool valid = 1;
+}
+
 
 service ClientService {
   // User APIs
@@ -144,4 +160,7 @@ service ClientService {
   rpc FinishWebauthnLogin(FinishWebauthnLoginRequest) returns (FinishWebauthnLoginResponse);
   // Machine APIs
   rpc AuthenticateMachine(AuthenticateMachineRequest) returns (AuthenticateMachineResponse);
+  // Other
+  rpc ValidateEmail(ValidateEmailRequest) returns (ValidateEmailResponse);
+  rpc ValidatePassword(ValidatePasswordRequest) returns (ValidatePasswordResponse);
 }

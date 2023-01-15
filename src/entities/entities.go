@@ -42,6 +42,11 @@ func ValidEntityId(entityId string) bool {
 	return err == nil
 }
 
+func ValidPassword(password string) bool {
+	err := pwdutils.Validate(password)
+	return err == nil
+}
+
 type TotpParams struct {
 	Enabled bool
 	Issuer  string

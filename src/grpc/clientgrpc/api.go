@@ -146,3 +146,23 @@ func (s clientgrpcServer) FinishWebauthnLogin(ctx context.Context, req *FinishWe
 	}
 	return
 }
+
+func (s clientgrpcServer) ValidateEmail(ctx context.Context, req *ValidateEmailRequest) (res *ValidateEmailResponse, err error) {
+	r, err := s.Api.ValidateEmail(req.Email)
+	if err == nil {
+		res = &ValidateEmailResponse{
+			Valid: r.Valid,
+		}
+	}
+	return
+}
+
+func (s clientgrpcServer) ValidatePassword(ctx context.Context, req *ValidatePasswordRequest) (res *ValidatePasswordResponse, err error) {
+	r, err := s.Api.ValidatePassword(req.Password)
+	if err == nil {
+		res = &ValidatePasswordResponse{
+			Valid: r.Valid,
+		}
+	}
+	return
+}
