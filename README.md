@@ -22,13 +22,14 @@ Identity Service as GoLang Exercise
     - [x] Token generation
     - [x] Reset completion
   - [x] Logout
+  - [ ] Logout all sessions
   - [x] WebAuthn: Association
   - [x] WebAuthn: Login
     - [ ] As 2FA after login with password?
   - [ ] Destroy entity
     - [ ] Enforcement with totp request
-  - [ ] ValidatePassword
-  - [ ] ValidateEmail
+  - [x] ValidatePassword
+  - [x] ValidateEmail
 - Admin:
   - [ ] Edit user
   - [ ] Edit machine

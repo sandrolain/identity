@@ -26,10 +26,12 @@ type ClientServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LoginConfirm(ctx context.Context, in *LoginConfirmRequest, opts ...grpc.CallOption) (*LoginConfirmResponse, error)
 	InitValidation(ctx context.Context, in *InitValidationRequest, opts ...grpc.CallOption) (*InitValidationResponse, error)
+	VerifyValidation(ctx context.Context, in *VerifyValidationRequest, opts ...grpc.CallOption) (*VerifyValidationResponse, error)
 	CompleteValidation(ctx context.Context, in *CompleteValidationRequest, opts ...grpc.CallOption) (*CompleteValidationResponse, error)
 	GetUserDetails(ctx context.Context, in *GetUserDetailsRequest, opts ...grpc.CallOption) (*GetUserDetailsResponse, error)
 	PasswordChange(ctx context.Context, in *PasswordChangeRequest, opts ...grpc.CallOption) (*PasswordChangeResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
+	LogoutAllSessions(ctx context.Context, in *LogoutAllSessionsRequest, opts ...grpc.CallOption) (*LogoutAllSessionsResponse, error)
 	BeginWebauthnRegister(ctx context.Context, in *BeginWebauthnRegisterRequest, opts ...grpc.CallOption) (*BeginWebauthnRegisterResponse, error)
 	FinishWebauthnRegister(ctx context.Context, in *FinishWebauthnRegisterRequest, opts ...grpc.CallOption) (*FinishWebauthnRegisterResponse, error)
 	BeginWebauthnLogin(ctx context.Context, in *BeginWebauthnLoginRequest, opts ...grpc.CallOption) (*BeginWebauthnLoginResponse, error)
@@ -76,6 +78,15 @@ func (c *clientServiceClient) InitValidation(ctx context.Context, in *InitValida
 	return out, nil
 }
 
+func (c *clientServiceClient) VerifyValidation(ctx context.Context, in *VerifyValidationRequest, opts ...grpc.CallOption) (*VerifyValidationResponse, error) {
+	out := new(VerifyValidationResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/VerifyValidation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *clientServiceClient) CompleteValidation(ctx context.Context, in *CompleteValidationRequest, opts ...grpc.CallOption) (*CompleteValidationResponse, error) {
 	out := new(CompleteValidationResponse)
 	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/CompleteValidation", in, out, opts...)
@@ -106,6 +117,15 @@ func (c *clientServiceClient) PasswordChange(ctx context.Context, in *PasswordCh
 func (c *clientServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
 	out := new(LogoutResponse)
 	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/Logout", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *clientServiceClient) LogoutAllSessions(ctx context.Context, in *LogoutAllSessionsRequest, opts ...grpc.CallOption) (*LogoutAllSessionsResponse, error) {
+	out := new(LogoutAllSessionsResponse)
+	err := c.cc.Invoke(ctx, "/clientgrpc.ClientService/LogoutAllSessions", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,10 +203,12 @@ type ClientServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	LoginConfirm(context.Context, *LoginConfirmRequest) (*LoginConfirmResponse, error)
 	InitValidation(context.Context, *InitValidationRequest) (*InitValidationResponse, error)
+	VerifyValidation(context.Context, *VerifyValidationRequest) (*VerifyValidationResponse, error)
 	CompleteValidation(context.Context, *CompleteValidationRequest) (*CompleteValidationResponse, error)
 	GetUserDetails(context.Context, *GetUserDetailsRequest) (*GetUserDetailsResponse, error)
 	PasswordChange(context.Context, *PasswordChangeRequest) (*PasswordChangeResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	LogoutAllSessions(context.Context, *LogoutAllSessionsRequest) (*LogoutAllSessionsResponse, error)
 	BeginWebauthnRegister(context.Context, *BeginWebauthnRegisterRequest) (*BeginWebauthnRegisterResponse, error)
 	FinishWebauthnRegister(context.Context, *FinishWebauthnRegisterRequest) (*FinishWebauthnRegisterResponse, error)
 	BeginWebauthnLogin(context.Context, *BeginWebauthnLoginRequest) (*BeginWebauthnLoginResponse, error)
@@ -212,6 +234,9 @@ func (UnimplementedClientServiceServer) LoginConfirm(context.Context, *LoginConf
 func (UnimplementedClientServiceServer) InitValidation(context.Context, *InitValidationRequest) (*InitValidationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InitValidation not implemented")
 }
+func (UnimplementedClientServiceServer) VerifyValidation(context.Context, *VerifyValidationRequest) (*VerifyValidationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyValidation not implemented")
+}
 func (UnimplementedClientServiceServer) CompleteValidation(context.Context, *CompleteValidationRequest) (*CompleteValidationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteValidation not implemented")
 }
@@ -223,6 +248,9 @@ func (UnimplementedClientServiceServer) PasswordChange(context.Context, *Passwor
 }
 func (UnimplementedClientServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+}
+func (UnimplementedClientServiceServer) LogoutAllSessions(context.Context, *LogoutAllSessionsRequest) (*LogoutAllSessionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogoutAllSessions not implemented")
 }
 func (UnimplementedClientServiceServer) BeginWebauthnRegister(context.Context, *BeginWebauthnRegisterRequest) (*BeginWebauthnRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BeginWebauthnRegister not implemented")
@@ -312,6 +340,24 @@ func _ClientService_InitValidation_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ClientService_VerifyValidation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyValidationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).VerifyValidation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/VerifyValidation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).VerifyValidation(ctx, req.(*VerifyValidationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ClientService_CompleteValidation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CompleteValidationRequest)
 	if err := dec(in); err != nil {
@@ -380,6 +426,24 @@ func _ClientService_Logout_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ClientServiceServer).Logout(ctx, req.(*LogoutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ClientService_LogoutAllSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutAllSessionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ClientServiceServer).LogoutAllSessions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/clientgrpc.ClientService/LogoutAllSessions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ClientServiceServer).LogoutAllSessions(ctx, req.(*LogoutAllSessionsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -530,6 +594,10 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ClientService_InitValidation_Handler,
 		},
 		{
+			MethodName: "VerifyValidation",
+			Handler:    _ClientService_VerifyValidation_Handler,
+		},
+		{
 			MethodName: "CompleteValidation",
 			Handler:    _ClientService_CompleteValidation_Handler,
 		},
@@ -544,6 +612,10 @@ var ClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Logout",
 			Handler:    _ClientService_Logout_Handler,
+		},
+		{
+			MethodName: "LogoutAllSessions",
+			Handler:    _ClientService_LogoutAllSessions_Handler,
 		},
 		{
 			MethodName: "BeginWebauthnRegister",

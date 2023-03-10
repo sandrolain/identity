@@ -27,24 +27,38 @@ func (s *RedisStorage) GetSession(sessionId string) (sessions.Session, error) {
 	}
 	return sess, err
 }
-func (s *RedisStorage) GetEntitySessions(entityId string) ([]sessions.Session, error) {
-	var sess sessions.Session
-	var res []sessions.Session
-	all, err := s.client.GetAll(redisutils.Key{"sessions", entityId}, &sess)
+func (s *RedisStorage) GetEntitySessions(entityId string) (res []sessions.Session, err error) {
+	var id string
+	all, err := s.client.GetAll(redisutils.Key{"entitySessions", entityId}, &id)
 	if err != nil {
-		return res, err
+		return
 	}
-	return redisutils.AllAsType[sessions.Session](all)
+
+	ids, err := redisutils.AllAsType[string](all)
+	if err != nil {
+		return
+	}
+
+	var sess sessions.Session
+	for _, id := range ids {
+		sess, err = s.GetSession(id)
+		if err != nil {
+			return
+		}
+		res = append(res, sess)
+	}
+
+	return
 }
 func (s *RedisStorage) SaveSession(sess sessions.Session) error {
+	err := s.client.Set(redisutils.Key{"entitySessions", sess.EntityId, sess.Id}, sess.Id, sess.GetTtl())
+	if err != nil {
+		return err
+	}
 	return s.client.Set(redisutils.Key{"sessions", sess.Id}, sess, sess.GetTtl())
 }
 func (s *RedisStorage) DeleteSession(sessionId string) error {
 	return s.client.Delete(redisutils.Key{"sessions", sessionId})
-}
-func (s *RedisStorage) DeleteEntitySessions(entityId string) error {
-	// TODO:
-	return nil
 }
 func (s *RedisStorage) SaveWebauthnSessionData(sessionId string, data webauthn.SessionData) error {
 	return s.client.Set(redisutils.Key{"webauthn", sessionId}, data, time.Minute*15) // TODO: duration from config

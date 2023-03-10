@@ -79,10 +79,6 @@ func (s *MongoDBStorage) DeleteSession(sessionId string) error {
 	_, err := s.client.DeleteOneById(SessionsCollection, sessionId)
 	return err
 }
-func (s *MongoDBStorage) DeleteEntitySessions(entityId string) error {
-	_, err := s.client.DeleteMany(SessionsCollection, map[string]string{"entityId": entityId})
-	return err
-}
 func (s *MongoDBStorage) SaveWebauthnCredential(cred authnweb.EntityCredential) error {
 	_, err := s.client.InsertOne(WebauthnCredsCollection, cred)
 	return err

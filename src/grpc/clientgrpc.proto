@@ -57,6 +57,24 @@ message LogoutResponse {
   string sessionId = 2;
 }
 
+message LogoutAllSessionsRequest {
+  string sessionToken = 1;
+}
+
+message LogoutAllSessionsResponse {
+  string id = 1;
+  int32 count = 2;
+}
+
+message DestroyRequest {
+  string totpToken = 1;
+  string totpCode = 2;
+}
+
+message DestroyResponse {
+  string id = 1;
+}
+
 message BeginWebauthnRegisterRequest {
   string sessionToken = 1;
 }
@@ -150,10 +168,12 @@ service ClientService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc LoginConfirm(LoginConfirmRequest) returns (LoginConfirmResponse);
   rpc InitValidation(InitValidationRequest) returns (InitValidationResponse);
+  rpc VerifyValidation(VerifyValidationRequest) returns (VerifyValidationResponse);
   rpc CompleteValidation(CompleteValidationRequest) returns (CompleteValidationResponse);
   rpc GetUserDetails(GetUserDetailsRequest) returns (GetUserDetailsResponse);
   rpc PasswordChange(PasswordChangeRequest) returns (PasswordChangeResponse);
   rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc LogoutAllSessions(LogoutAllSessionsRequest) returns (LogoutAllSessionsResponse);
   rpc BeginWebauthnRegister(BeginWebauthnRegisterRequest) returns (BeginWebauthnRegisterResponse);
   rpc FinishWebauthnRegister(FinishWebauthnRegisterRequest) returns (FinishWebauthnRegisterResponse);
   rpc BeginWebauthnLogin(BeginWebauthnLoginRequest) returns (BeginWebauthnLoginResponse);

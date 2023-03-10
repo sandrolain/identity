@@ -91,6 +91,29 @@ func (a *API) DeleteSession(sessionId string) (err error) {
 	return
 }
 
-func (a *API) GetEntitySessions(entityId string) ([]sessions.Session, error) {
-	return a.VolatileStorage.GetEntitySessions(entityId)
+func (a *API) GetEntitySessions(entityId string) (res []sessions.Session, err error) {
+	res, err = a.VolatileStorage.GetEntitySessions(entityId)
+	if err != nil {
+		return
+	}
+
+	var found map[string]bool
+
+	for _, s := range res {
+		found[s.Id] = true
+	}
+
+	psess, err := a.PersistentStorage.GetEntitySessions(entityId)
+	if err != nil {
+		return
+	}
+
+	for _, s := range psess {
+		ok := found[s.Id]
+		if !ok {
+			res = append(res, s)
+		}
+	}
+
+	return
 }

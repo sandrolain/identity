@@ -31,6 +31,11 @@ type LogoutResult struct {
 	SessionId string
 }
 
+type LogoutAllSessionsResult struct {
+	EntityId      string
+	SessionsCount int32
+}
+
 func (a *API) Login(entityType entities.EntityType, entityId string, password string) (res LoginResult, err error) {
 	if !entities.ValidEntityId(entityId) {
 		err = crudutils.InvalidValue(entityId)
@@ -138,5 +143,33 @@ func (a *API) Logout(token string) (res LogoutResult, err error) {
 	}
 	res.EntityId = u.Id
 	res.SessionId = s.Id
+	return
+}
+
+func (a *API) LogoutAllSessions(token string) (res LogoutAllSessionsResult, err error) {
+	u, _, err := a.AuthenticateWithSessionJWT(sessions.ScopeLogin, token)
+	if err != nil {
+		return
+	}
+	if u.Type != entities.TypeAdmin && u.Type != entities.TypeUser {
+		err = crudutils.NotAuthorized("user type")
+		return
+	}
+
+	sess, err := a.GetEntitySessions(u.Id)
+	if err != nil {
+		return
+	}
+
+	for _, s := range sess {
+		err = a.VolatileStorage.DeleteSession(s.Id)
+		if err != nil {
+			return
+		}
+		res.SessionsCount++
+	}
+
+	res.EntityId = u.Id
+
 	return
 }
